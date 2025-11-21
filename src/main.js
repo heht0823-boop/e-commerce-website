@@ -5,11 +5,8 @@ import { createPinia } from "pinia";
 
 import App from "./App.vue";
 import router from "./router";
-//测试接口函数
-import { getCategory } from "./apis/testAPI";
-getCategory().then((res) => {
-  console.log(res);
-});
+//引入初始化样式
+import "@/styles/common.scss";
 
 const app = createApp(App);
 
