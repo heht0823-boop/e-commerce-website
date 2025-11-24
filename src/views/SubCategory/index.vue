@@ -1,39 +1,9 @@
 <script setup>
-import { getCategoryFilterAPI, getSubCategoryAPI } from "@/apis/category";
-import { ref, onMounted, watch } from "vue";
-import { useRoute } from "vue-router";
 import GoodsItem from "@/views/home/components/GoodsItem.vue";
-//获取面包屑导航数据
-const categoryData = ref({});
-const route = useRoute();
-const getCategoryData = async () => {
-  const res = await getCategoryFilterAPI(route.params.id);
-  categoryData.value = res.result;
-};
-watch(
-  () => route.params.id,
-  (newId, oldId) => {
-    if (newId !== oldId) {
-      getCategoryData();
-    }
-  }
-);
-//获取基础列表数据渲染
-const goodsList = ref([]);
-const reqData = ref({
-  categoryId: route.params.id,
-  page: 1,
-  pageSize: 20,
-  sortField: "publishTime",
-});
-const getGoodsList = async () => {
-  const res = await getSubCategoryAPI(reqData.value);
-  goodsList.value = res.result.items;
-};
-onMounted(() => {
-  getCategoryData();
-  getGoodsList();
-});
+import { useCategoryFilter } from "@/views/SubCategory/composables/useCategoryFilter";
+import { useSubCategory } from "@/views/SubCategory/composables/useSubCategory";
+const { categoryData } = useCategoryFilter();
+const { goodsList } = useSubCategory();
 </script>
 
 <template>
