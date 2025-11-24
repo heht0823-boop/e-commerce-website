@@ -2,7 +2,6 @@ import httpInstance from "@/utils/http";
 
 //获取banner数据
 export function getBannerAPI(params = {}) {
-  console.log("接收到的参数:", params);
   // 默认为1 商品为2
   const { distributionSite = "1" } = params;
   return httpInstance({
