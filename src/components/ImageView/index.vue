@@ -1,14 +1,13 @@
 <script setup>
 import { ref, watch } from "vue";
 import { useMouseInElement } from "@vueuse/core";
-// 图片列表
-const imageList = [
-  "https://yanxuan-item.nosdn.127.net/d917c92e663c5ed0bb577c7ded73e4ec.png",
-  "https://yanxuan-item.nosdn.127.net/e801b9572f0b0c02a52952b01adab967.jpg",
-  "https://yanxuan-item.nosdn.127.net/b52c447ad472d51adbdde1a83f550ac2.jpg",
-  "https://yanxuan-item.nosdn.127.net/f93243224dc37674dfca5874fe089c60.jpg",
-  "https://yanxuan-item.nosdn.127.net/f881cfe7de9a576aaeea6ee0d1d24823.jpg",
-];
+//props适配图片列表
+defineProps({
+  imageList: {
+    type: Array,
+    default: () => [],
+  },
+});
 
 //1.小图切换大图显示
 const activeIndex = ref(0);
@@ -26,33 +25,30 @@ const top = ref(0);
 const positionX = ref(0);
 const positionY = ref(0);
 watch([elementX, elementY], () => {
-  //如果鼠标没有一如盒子里面,直接不执行后面的逻辑
+  // 如果鼠标没有进入盒子里面,直接不执行后面的逻辑
   if (isOutside.value) return;
-  //有效范围内控制滑块距离
-  //横向
-  if (elementX.value > 100 && elementX.value < 300) {
-    left.value = elementX.value - 100;
-  }
-  //纵向
-  if (elementY.value > 100 && elementY.value < 300) {
-    top.value = elementY.value - 100;
-  }
-  //处理边界
-  if (elementX.value > 300) {
-    left.value = 200;
-  }
-  if (elementX.value < 100) {
-    left.value = 0;
-  }
-  if (elementY.value > 300) {
-    top.value = 200;
-  }
-  if (elementY.value < 100) {
-    top.value = 0;
-  }
-  //控制大图的显示
-  positionX.value = left.value * 2;
-  positionY.value = top.value * 2;
+
+  // 获取容器尺寸和滑块尺寸
+  const containerWidth = 400;
+  const containerHeight = 400;
+  const layerWidth = 200;
+  const layerHeight = 200;
+
+  // 计算滑块的边界范围
+  const maxX = containerWidth - layerWidth; // 200
+  const maxY = containerHeight - layerHeight; // 200
+
+  // 计算滑块位置（居中于鼠标位置）
+  left.value = elementX.value - layerWidth / 2;
+  top.value = elementY.value - layerHeight / 2;
+
+  // 边界处理
+  left.value = Math.max(0, Math.min(left.value, maxX));
+  top.value = Math.max(0, Math.min(top.value, maxY));
+
+  // 控制大图的显示（注意负号，因为backgroundPosition是相反方向）
+  positionX.value = -left.value * 2;
+  positionY.value = -top.value * 2;
 });
 </script>
 
@@ -80,7 +76,7 @@ watch([elementX, elementY], () => {
       class="large"
       :style="[
         {
-          backgroundImage: `url(${imageList[0]})`,
+          backgroundImage: `url(${imageList[activeIndex]})`,
           backgroundPositionX: `${positionX}px`,
           backgroundPositionY: `${positionY}px`,
         },
