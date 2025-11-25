@@ -3,7 +3,7 @@ import GoodsItem from "@/views/home/components/GoodsItem.vue";
 import { useCategoryFilter } from "@/views/SubCategory/composables/useCategoryFilter";
 import { useSubCategory } from "@/views/SubCategory/composables/useSubCategory";
 const { categoryData } = useCategoryFilter();
-const { goodsList } = useSubCategory();
+const { goodsList, reqData } = useSubCategory();
 </script>
 
 <template>
@@ -19,7 +19,7 @@ const { goodsList } = useSubCategory();
       </el-breadcrumb>
     </div>
     <div class="sub-container">
-      <el-tabs>
+      <el-tabs v-model="reqData.sortField">
         <el-tab-pane label="最新商品" name="publishTime"></el-tab-pane>
         <el-tab-pane label="最高人气" name="orderNum"></el-tab-pane>
         <el-tab-pane label="评论最多" name="evaluateNum"></el-tab-pane>

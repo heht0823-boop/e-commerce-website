@@ -1,7 +1,6 @@
 import { ref, onMounted, watch } from "vue";
 import { getSubCategoryAPI } from "@/apis/category";
 import { useRoute } from "vue-router";
-
 export function useSubCategory() {
   const route = useRoute();
   //获取基础列表数据渲染
@@ -19,19 +18,21 @@ export function useSubCategory() {
     };
     const res = await getSubCategoryAPI(requestData);
     goodsList.value = res.result.items;
+    console.log(reqData.value);
   };
+  // 监听多个参数变化
   watch(
-    () => route.params.id,
-    (newId, oldId) => {
-      if (newId !== oldId) {
-        getGoodsList();
-      }
+    () => [reqData.value.sortField, reqData.value.page],
+    () => {
+      getGoodsList();
     }
   );
   onMounted(() => {
     getGoodsList();
   });
   return {
+    getGoodsList,
     goodsList,
+    reqData,
   };
 }
