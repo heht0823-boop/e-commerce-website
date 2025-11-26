@@ -1,9 +1,10 @@
 <script setup>
 import { ref } from "vue";
-import { loginAPI } from "@/apis/user";
 import "element-plus/theme-chalk/el-message.css";
 import { ElMessage } from "element-plus";
 import { useRouter } from "vue-router";
+import { useUserStore } from "@/stores/user";
+const UserStore = useUserStore();
 //表单验证(账号名+密码)
 //1.准备表单对象
 const form = ref({
@@ -54,8 +55,7 @@ const dologin = () => {
     //vaild为true表示所有验证通过
     if (vaild) {
       // 登录成功
-      const res = await loginAPI({ account, password });
-      console.log(res);
+      await UserStore.getUserInfo({ account, password });
       //1.提示用户
       ElMessage({ type: "success", message: "登录成功" });
       //2.跳转首页
