@@ -41,6 +41,20 @@ const rules = {
     },
   ],
 };
+//3.获取form实例做统一校验
+const formRef = ref(null);
+const dologin = () => {
+  formRef.value.validate((vaild) => {
+    //vaild为true表示所有验证通过
+    if (vaild) {
+      // 登录成功
+      alert("登录成功");
+    }
+  });
+};
+//1.用户名和密码 只需要通过简单的配置(看文档的方式-复杂功能通过多个不同组件拆解)
+//2.同意协议 自定义规则 validator:(rule,value,callback)=>{}
+//3.统一校验 通过调用from实例的方法validate->true
 </script>
 
 <template>
@@ -65,6 +79,7 @@ const rules = {
         <div class="account-box">
           <div class="form">
             <el-form
+              ref="formRef"
               :model="form"
               :rules="rules"
               label-position="right"
@@ -82,7 +97,7 @@ const rules = {
                   我已同意隐私条款和服务条款
                 </el-checkbox>
               </el-form-item>
-              <el-button size="large" class="subBtn">点击登录</el-button>
+              <el-button size="large" class="subBtn" @click="dologin">点击登录</el-button>
             </el-form>
           </div>
         </div>
