@@ -17,10 +17,15 @@ export const useUserStore = defineStore(
         throw error;
       }
     };
+    //退出时清除用户信息
+    const clearUserInfo = () => {
+      userInfo.value = {};
+    };
     //3.以对象的格式把state和action返回出去
     return {
       userInfo,
       getUserInfo,
+      clearUserInfo,
     };
   },
   {
