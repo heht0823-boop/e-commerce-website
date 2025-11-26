@@ -1,5 +1,6 @@
 //axios基础封装
 import axios from "axios";
+import { ElMessage } from "element-plus";
 
 const httpInstance = axios.create({
   //基地址
@@ -19,6 +20,11 @@ httpInstance.interceptors.request.use(
 httpInstance.interceptors.response.use(
   (res) => res.data,
   (e) => {
+    //统一错误提示
+    ElMessage({
+      type: "warning",
+      message: e.response.data.message,
+    });
     return Promise.reject(e);
   }
 );
