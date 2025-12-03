@@ -2,6 +2,7 @@
 import axios from "axios";
 import { ElMessage } from "element-plus";
 import { useUserStore } from "@/stores/user";
+import router from "@/router";
 
 const httpInstance = axios.create({
   //基地址
@@ -28,11 +29,19 @@ httpInstance.interceptors.request.use(
 httpInstance.interceptors.response.use(
   (res) => res.data,
   (e) => {
+    const userStore = useUserStore();
     //统一错误提示
     ElMessage({
       type: "warning",
       message: e.response.data.message,
     });
+    //401token失效处理
+    //清除本地用户数据
+    //跳转到登录页
+    if (e.status.response === 401) {
+      userStore.clearUserInfo();
+      router.push("/login");
+    }
     return Promise.reject(e);
   }
 );
