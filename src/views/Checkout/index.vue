@@ -1,36 +1,89 @@
 <script setup>
-import { getCheckInfoAPI } from "@/apis/checkout";
+import { getCheckInfoAPI, createOrderAPI } from "@/apis/checkout";
+import { useRouter } from "vue-router";
 import { onMounted, ref } from "vue";
+import { useCartStore } from "@/stores/cartStore";
+import { ElMessage } from "element-plus";
+
 const checkInfo = ref({}); // 订单对象
+const router = useRouter();
+const cartStore = useCartStore();
 const curAddress = ref(null); // 当前选中的地址
+const addFlag = ref(false); // 添加地址弹窗控制
+
 const getCheckInfo = async () => {
   try {
     const res = await getCheckInfoAPI();
     checkInfo.value = res.result;
-    // 设置默认地址
-    const item = checkInfo.value.userAddresses.find((item) => item.isDefault === 0);
-    curAddress.value = item;
+    //默认收货地址
+    curAddress.value = checkInfo.value.userAddresses.find((item) => item.isDefault);
   } catch (error) {
     console.error("获取结算信息失败", error);
-    // 可以添加用户友好的错误提示
+    ElMessage.error("获取结算信息失败");
   }
 };
+
 onMounted(() => {
   getCheckInfo();
 });
+
 const activeAddress = ref({});
-//控制弹框打开
+// 控制弹框打开
 const toggleFlag = ref(false);
-//切换地址
+
+// 切换地址
 const switchAddress = (item) => {
   activeAddress.value = item;
 };
-//确定切换地址
+
 // 确认切换地址
 const confirmSwitch = () => {
   curAddress.value = activeAddress.value;
   toggleFlag.value = false;
   activeAddress.value = {};
+};
+
+// 创建订单
+const createOrder = async () => {
+  if (!curAddress.value || !curAddress.value.id) {
+    ElMessage.warning("请选择收货地址");
+    return;
+  }
+
+  try {
+    // 构造订单商品数据
+    const goods = checkInfo.value.goods.map((item) => {
+      return {
+        skuId: item.skuId,
+        count: item.count,
+      };
+    });
+
+    const res = await createOrderAPI({
+      deliveryTimeType: 1,
+      payType: 1,
+      payChannel: 1,
+      buyerMessage: "",
+      goods: goods,
+      addressId: curAddress.value.id,
+    });
+
+    const orderId = res.result.id;
+
+    // 更新购物车
+    await cartStore.updateNewList();
+
+    // 跳转到支付页
+    router.push({
+      path: "/pay",
+      query: {
+        id: orderId,
+      },
+    });
+  } catch (error) {
+    console.error("创建订单失败", error);
+    ElMessage.error("创建订单失败");
+  }
 };
 </script>
 
@@ -55,7 +108,12 @@ const confirmSwitch = () => {
               </ul>
             </div>
             <div class="action">
-              <el-button size="large" @click="toggleFlag = true">切换地址</el-button>
+              <el-button
+                size="large"
+                @click="toggleFlag = true"
+                :disabled="!checkInfo.userAddresses || checkInfo.userAddresses.length === 0"
+                >切换地址</el-button
+              >
               <el-button size="large" @click="addFlag = true">添加地址</el-button>
             </div>
           </div>
@@ -63,7 +121,7 @@ const confirmSwitch = () => {
         <!-- 商品信息 -->
         <h3 class="box-title">商品信息</h3>
         <div class="box-body">
-          <table class="goods">
+          <table class="goods" v-if="checkInfo.goods && checkInfo.goods.length > 0">
             <thead>
               <tr>
                 <th width="520">商品信息</th>
@@ -85,12 +143,13 @@ const confirmSwitch = () => {
                   </a>
                 </td>
                 <td>&yen;{{ i.price }}</td>
-                <td>{{ i.price }}</td>
+                <td>{{ i.count }}</td>
                 <td>&yen;{{ i.totalPrice }}</td>
                 <td>&yen;{{ i.totalPayPrice }}</td>
               </tr>
             </tbody>
           </table>
+          <div v-else>暂无商品信息</div>
         </div>
         <!-- 配送时间 -->
         <h3 class="box-title">配送时间</h3>
@@ -112,32 +171,32 @@ const confirmSwitch = () => {
           <div class="total">
             <dl>
               <dt>商品件数：</dt>
-              <dd>{{ checkInfo.summary?.goodsCount }}件</dd>
+              <dd>{{ checkInfo.summary?.goodsCount || 0 }}件</dd>
             </dl>
             <dl>
               <dt>商品总价：</dt>
-              <dd>¥{{ checkInfo.summary?.totalPrice.toFixed(2) }}</dd>
+              <dd>¥{{ checkInfo.summary?.totalPrice?.toFixed(2) || "0.00" }}</dd>
             </dl>
             <dl>
               <dt>运<i></i>费：</dt>
-              <dd>¥{{ checkInfo.summary?.postFee.toFixed(2) }}</dd>
+              <dd>¥{{ checkInfo.summary?.postFee?.toFixed(2) || "0.00" }}</dd>
             </dl>
             <dl>
               <dt>应付总额：</dt>
-              <dd class="price">{{ checkInfo.summary?.totalPayPrice.toFixed(2) }}</dd>
+              <dd class="price">¥{{ checkInfo.summary?.totalPayPrice?.toFixed(2) || "0.00" }}</dd>
             </dl>
           </div>
         </div>
         <!-- 提交订单 -->
         <div class="submit">
-          <el-button type="primary" size="large">提交订单</el-button>
+          <el-button @click="createOrder" type="primary" size="large">提交订单</el-button>
         </div>
       </div>
     </div>
   </div>
   <!-- 切换地址 -->
   <el-dialog v-model="toggleFlag" title="切换收货地址" width="30%" center>
-    <div class="addressWrapper">
+    <div class="addressWrapper" v-if="checkInfo.userAddresses">
       <div
         class="text item"
         :class="{ active: activeAddress.id === item.id }"
@@ -150,7 +209,7 @@ const confirmSwitch = () => {
             <span>收<i />货<i />人：</span>{{ item.receiver }}
           </li>
           <li><span>联系方式：</span>{{ item.contact }}</li>
-          <li><span>收货地址：</span>{{ item.fullLocation + item.address }}</li>
+          <li><span>收货地址：</span>{{ item.fullLocation }} {{ item.address }}</li>
         </ul>
       </div>
     </div>
