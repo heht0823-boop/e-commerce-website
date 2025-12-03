@@ -1,12 +1,17 @@
 //封装购物车模块
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
-import { useUserStore } from "./user";
-import { insertCartAPI, findNewCartListAPI } from "./cart";
+import { useUserStore } from "./userStore";
+import { insertCartAPI, findNewCartListAPI, deleteCartAPI } from "../apis/cart";
 
 export const useCartStore = defineStore(
   "cart",
   () => {
+    //获取最新购物车的列表action
+    const updateNewList = async () => {
+      const res = await findNewCartListAPI();
+      cartList.value = res.result;
+    };
     const userStore = useUserStore();
     const isLogin = computed(() => userStore.userInfo.token);
     //1.定义state-cartList
@@ -17,8 +22,7 @@ export const useCartStore = defineStore(
       if (isLogin.value) {
         //已登录
         await insertCartAPI({ skuId, count });
-        const res = await findNewCartListAPI();
-        cartList.value = res.result;
+        updateNewList();
       } else {
         //未登录
         //添加购物车操作
@@ -36,11 +40,17 @@ export const useCartStore = defineStore(
       }
     };
     //删除购物车
-    const delCart = (skuId) => {
-      //思路：1.找到要删除项的下标值-splice
-      //2.使用数组的过滤方法-filter
-      const index = cartList.value.findIndex((item) => skuId === item.skuId);
-      cartList.value.splice(index, 1);
+    const delCart = async (skuId) => {
+      if (isLogin.value) {
+        //调用接口实现接口购物车的功能实现
+        await deleteCartAPI([skuId]);
+        updateNewList();
+      } else {
+        //思路：1.找到要删除项的下标值-splice
+        //2.使用数组的过滤方法-filter
+        const index = cartList.value.findIndex((item) => skuId === item.skuId);
+        cartList.value.splice(index, 1);
+      }
     };
     //计算属性
     //1.总的数量 所有项的count之和

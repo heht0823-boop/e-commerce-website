@@ -11,6 +11,16 @@ export const insertCartAPI = ({ skuId, count }) => {
     },
   });
 };
+//删除购物车
+export const deleteCartAPI = (ids) => {
+  return request({
+    url: "/member/cart",
+    method: "DELETE",
+    data: {
+      ids,
+    },
+  });
+};
 
 //获取最新的购物车列表
 export const findNewCartListAPI = () => {
