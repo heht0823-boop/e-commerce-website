@@ -60,7 +60,8 @@ const router = createRouter({
           component: Member,
           children: [
             {
-              path: "user",
+              //置空默认显示三级路由
+              path: "",
               component: UserInfo,
             },
             {
