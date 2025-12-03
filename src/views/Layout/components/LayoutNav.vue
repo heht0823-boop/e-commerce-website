@@ -17,9 +17,11 @@ const confirm = () => {
       <ul>
         <template v-if="userStore.userInfo.token">
           <li>
-            <a href="javascript:;"
-              ><i class="iconfont icon-user"></i>{{ userStore.userInfo.account }}</a
-            >
+            <router-link to="/member" class="user-link">
+              <a href="javascript:;">
+                <i class="iconfont icon-user"></i>{{ userStore.userInfo.account }}
+              </a>
+            </router-link>
           </li>
           <li>
             <el-popconfirm
