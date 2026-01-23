@@ -4,10 +4,10 @@ export const lazyPlugin = {
   install(app) {
     //定义全局指令
     app.directive("img-lazy", {
-      mounted(el, bingding) {
+      mounted(el, binding) {
         const { stop } = useIntersectionObserver(el, ([{ isIntersecting }]) => {
           if (isIntersecting) {
-            el.src = bingding.value;
+            el.src = binding.value;
             stop();
           }
         });

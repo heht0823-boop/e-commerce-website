@@ -11,6 +11,7 @@ const singleCheck = (selected, i) => {
 const allCheck = (selected) => {
   cartStore.allCheck(selected);
 };
+console.log(cartStore.cartList);
 </script>
 
 <template>

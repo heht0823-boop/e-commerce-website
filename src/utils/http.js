@@ -22,27 +22,40 @@ httpInstance.interceptors.request.use(
     }
     return config;
   },
-  (e) => Promise.reject(e)
+  (e) => Promise.reject(e),
 );
+let isredirectingToLogin = false;
 
 // axios响应式拦截器
 httpInstance.interceptors.response.use(
   (res) => res.data,
   (e) => {
     const userStore = useUserStore();
-    //统一错误提示
-    ElMessage({
-      type: "warning",
-      message: e.response.data.message,
-    });
+    if (e.code === "ECONNABORTED" || e.message.includes("timeout")) {
+      //超时错误
+      ElMessage.error("请求超时，请稍后重试");
+    } else if (e.response?.status >= 500) {
+      //服务器错误
+      ElMessage.error("服务器错误，请稍后重试");
+    } else if (e.response?.status >= 400) {
+      ElMessage.warning(e.response?.data?.message || "请求失败");
+    } else {
+      //网络等其他问题
+      ElMessage.error("网络异常，请检查网络");
+    }
     //401token失效处理
     //清除本地用户数据
     //跳转到登录页
-    if (e.status.response === 401) {
-      userStore.clearUserInfo();
-      router.push("/login");
+    if (e.response?.status === 401) {
+      if (!isredirectingToLogin) {
+        isredirectingToLogin = true;
+        userStore.clearUserInfo();
+        router.push("/login").then(() => {
+          isredirectingToLogin = false;
+        });
+      }
     }
     return Promise.reject(e);
-  }
+  },
 );
 export default httpInstance;

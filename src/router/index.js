@@ -1,72 +1,66 @@
 //createRouter:创建router实例对象
 //createWebHistory:创建history模式路由
 import { createRouter, createWebHistory } from "vue-router";
-import Login from "@/views/Login/index.vue";
-import Layout from "@/views/Layout/index.vue";
-import Home from "@/views/home/index.vue";
-import Category from "@/views/Category/index.vue";
-import SubCategory from "@/views/SubCategory/index.vue";
-import Detail from "@/views/Detail/index.vue";
-import CartList from "@/views/CartList/index.vue";
-import Checkout from "@/views/Checkout/index.vue";
-import Pay from "@/views/Pay/index.vue";
-import PayBack from "@/views/Pay/PayBack.vue";
-import Member from "@/views/Member/index.vue";
-import UserInfo from "@/views/Member/components/UserInfo.vue";
-import UserOrder from "@/views/Member/components/UserOrder.vue";
-
+import { useUserStore } from "@/stores/userStore";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   //path和component对应关系的位置
   routes: [
     {
       path: "/",
-      component: Layout,
+      component: () => import("@/views/Layout/index.vue"),
       children: [
         {
           path: "",
-          component: Home,
+          component: () => import("@/views/home/index.vue"),
         },
         {
           path: "category/:id",
-          component: Category,
+          component: () => import("@/views/Category/index.vue"),
         },
         {
           path: "category/sub/:id",
-          component: SubCategory,
+          component: () => import("@/views/SubCategory/index.vue"),
         },
         {
           path: "detail/:id",
-          component: Detail,
+          component: () => import("@/views/Detail/index.vue"),
         },
         {
           path: "cartlist",
-          component: CartList,
+          component: () => import("@/views/CartList/index.vue"),
+          meta: { requiresAuth: true },
         },
         {
           path: "checkout",
-          component: Checkout,
+          component: () => import("@/views/Checkout/index.vue"),
+          meta: { requiresAuth: true },
         },
         {
           path: "pay",
-          component: Pay,
+          component: () => import("@/views/Pay/index.vue"),
+          meta: { requiresAuth: true },
         },
         {
           path: "paycallback",
-          component: PayBack,
+          component: () => import("@/views/Pay/PayBack.vue"),
+          meta: { requiresAuth: true },
         },
         {
           path: "member",
-          component: Member,
+          component: () => import("@/views/Member/index.vue"),
+          meta: { requiresAuth: true },
           children: [
             {
               //置空默认显示三级路由
               path: "",
-              component: UserInfo,
+              component: () => import("@/views/Member/components/UserInfo.vue"),
+              meta: { requiresAuth: true },
             },
             {
               path: "order",
-              component: UserOrder,
+              component: () => import("@/views/Member/components/UserOrder.vue"),
+              meta: { requiresAuth: true },
             },
           ],
         },
@@ -74,13 +68,30 @@ const router = createRouter({
     },
     {
       path: "/login",
-      component: Login,
+      component: () => import("@/views/Login/index.vue"),
     },
   ],
   // 滚动行为
   scrollBehavior() {
     return { top: 0 };
   },
+});
+router.beforeEach((to, from, next) => {
+  const userStore = useUserStore();
+
+  // 检查路由是否需要认证
+  const requiresAuth = to.meta.requiresAuth;
+
+  if (requiresAuth && !userStore.isLogin) {
+    // 未登录，跳转到登录页面
+    next({
+      path: "/login",
+      query: { redirect: to.fullPath }, // 保存目标路径，登录后可以跳转回去
+    });
+  } else {
+    // 已登录或不需要认证，继续导航
+    next();
+  }
 });
 
 export default router;

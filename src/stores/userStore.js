@@ -1,6 +1,6 @@
 //管理用户相关数据
 import { defineStore } from "pinia";
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { loginAPI } from "@/apis/user";
 import { useCartStore } from "./cartStore";
 import { mergeCartAPI } from "@/apis/cart";
@@ -37,14 +37,19 @@ export const useUserStore = defineStore(
       //执行清除购物车的action函数
       cartStore.clearCart();
     };
+    //检查登录状态
+    const isLogin = computed(() => {
+      return userInfo.value && Object.keys(userInfo.value).length > 0;
+    });
     //3.以对象的格式把state和action返回出去
     return {
       userInfo,
       getUserInfo,
       clearUserInfo,
+      isLogin,
     };
   },
   {
     persist: true,
-  }
+  },
 );
