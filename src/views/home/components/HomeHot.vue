@@ -5,7 +5,7 @@ import { ref } from "vue";
 const hotList = ref([]);
 const getHotList = async () => {
   const res = await getHotAPI();
-  hotList.value = res.result;
+  hotList.value = res.data.result;
 };
 getHotList();
 </script>

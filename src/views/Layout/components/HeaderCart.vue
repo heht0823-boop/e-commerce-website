@@ -6,11 +6,14 @@ const cartStore = useCartStore();
 <template>
   <div class="cart">
     <a class="curr" href="javascript:;">
-      <i class="iconfont icon-cart"></i><em>{{ cartStore.cartList.length }}</em>
+      <i class="iconfont icon-cart"></i>
+      <!-- 修改：确保 cartList 存在再访问 length -->
+      <em>{{ cartStore.cartList ? cartStore.cartList.length : 0 }}</em>
     </a>
     <div class="layer">
       <div class="list">
-        <div class="item" v-for="i in cartStore.cartList" :key="i">
+        <!-- 修改：确保 cartList 存在再遍历 -->
+        <div class="item" v-for="i in cartStore.cartList || []" :key="i.skuId || i.id">
           <RouterLink to="">
             <img :src="i.picture" alt="" />
             <div class="center">
@@ -29,8 +32,9 @@ const cartStore = useCartStore();
       </div>
       <div class="foot">
         <div class="total">
-          <p>共{{ cartStore.allCount }}件商品</p>
-          <p>&yen; {{ cartStore.allPrice.toFixed(2) }}</p>
+          <!-- 修改：确保 cartList 存在再访问计算属性 -->
+          <p>共{{ cartStore.allCount || 0 }}件商品</p>
+          <p>&yen; {{ (cartStore.allPrice || 0).toFixed(2) }}</p>
         </div>
         <el-button size="large" type="primary" @click="$router.push('/cartlist')"
           >去购物车结算</el-button

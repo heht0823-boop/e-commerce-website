@@ -9,7 +9,7 @@ export function useBanner() {
       distributionSite: "2",
     };
     const res = await getBannerAPI(params);
-    bannerList.value = res.result;
+    bannerList.value = res.data.result;
   };
 
   onMounted(() => getBanner());

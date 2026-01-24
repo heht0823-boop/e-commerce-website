@@ -6,7 +6,7 @@ import GoodsItem from "@/views/home/components/GoodsItem.vue";
 const goodsProduct = ref([]);
 const getGoodsProduct = async () => {
   const res = await getGoodsAPI();
-  goodsProduct.value = res.result;
+  goodsProduct.value = res.data.result;
 };
 getGoodsProduct();
 </script>

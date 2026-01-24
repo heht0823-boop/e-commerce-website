@@ -8,7 +8,7 @@ export function useCategory() {
   const route = useRoute();
   const getCategory = async () => {
     const res = await getTopCategoryAPI(route.params.id);
-    categoryData.value = res.result;
+    categoryData.value = res.data.result;
   };
   onMounted(() => getCategory());
 
@@ -19,7 +19,7 @@ export function useCategory() {
       if (newId !== oldId) {
         getCategory();
       }
-    }
+    },
   );
   return { categoryData };
 }

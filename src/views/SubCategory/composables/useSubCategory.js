@@ -27,13 +27,13 @@ export function useSubCategory() {
 
       // 根据页码判断是刷新还是加载更多
       if (reqData.value.page === 1) {
-        goodsList.value = res.result.items; // 刷新数据
+        goodsList.value = res.data.result.items; // 刷新数据
       } else {
-        goodsList.value = [...goodsList.value, ...res.result.items]; // 加载更多
+        goodsList.value = [...goodsList.value, ...res.data.result.items]; // 加载更多
       }
 
       // 判断是否还有更多数据
-      if (res.result.items.length < reqData.value.pageSize) {
+      if (res.data.result.items.length < reqData.value.pageSize) {
         finished.value = true;
       } else {
         finished.value = false;
@@ -54,7 +54,7 @@ export function useSubCategory() {
         finished.value = false;
       }
       getGoodsList();
-    }
+    },
   );
 
   onMounted(() => {

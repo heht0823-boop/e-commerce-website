@@ -7,7 +7,7 @@ export function useCategoryFilter() {
   const route = useRoute();
   const getCategoryData = async () => {
     const res = await getCategoryFilterAPI(route.params.id);
-    categoryData.value = res.result;
+    categoryData.value = res.data.result;
   };
   watch(
     () => route.params.id,
@@ -15,7 +15,7 @@ export function useCategoryFilter() {
       if (newId !== oldId) {
         getCategoryData();
       }
-    }
+    },
   );
   onMounted(() => {
     getCategoryData();

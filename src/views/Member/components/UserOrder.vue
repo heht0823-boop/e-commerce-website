@@ -21,8 +21,8 @@ const params = ref({
 });
 const getOrderList = async () => {
   const res = await getUserOrder(params.value);
-  orderList.value = res.result.items;
-  total.value = res.result.counts;
+  orderList.value = res.data.result.items;
+  total.value = res.data.result.counts;
 };
 onMounted(() => {
   getOrderList();

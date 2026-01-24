@@ -17,7 +17,7 @@ const formatCountdown = (seconds) => {
 
 const getPayInfo = async () => {
   const res = await getOrderAPI(route.query.id);
-  payInfo.value = res.result;
+  payInfo.value = res.data.result;
 
   // 直接使用后端返回的秒数
   formatTime.value = formatCountdown(payInfo.value.countdown);

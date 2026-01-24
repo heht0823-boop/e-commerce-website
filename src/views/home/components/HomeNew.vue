@@ -6,7 +6,7 @@ const newList = ref([]);
 
 const getNewList = async () => {
   const res = await findNewAPI();
-  newList.value = res.result;
+  newList.value = res.data.result;
 };
 getNewList();
 </script>

@@ -11,7 +11,10 @@ const singleCheck = (selected, i) => {
 const allCheck = (selected) => {
   cartStore.allCheck(selected);
 };
-console.log(cartStore.cartList);
+//删除购物车
+const delCart = async (item) => {
+  await cartStore.delCart(item.skuId);
+};
 </script>
 
 <template>
@@ -80,7 +83,7 @@ console.log(cartStore.cartList);
               <td colspan="6">
                 <div class="cart-none">
                   <el-empty description="购物车列表为空">
-                    <el-button type="primary">随便逛逛</el-button>
+                    <el-button type="primary" @click="$router.push('/')">随便逛逛</el-button>
                   </el-empty>
                 </div>
               </td>

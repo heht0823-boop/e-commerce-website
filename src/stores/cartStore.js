@@ -59,11 +59,11 @@ export const useCartStore = defineStore(
     //计算属性
     //1.总的数量 所有项的count之和
     const allCount = computed(() =>
-      cartList.value.reduce((preValue, item) => preValue + item.count, 0)
+      cartList.value.reduce((preValue, item) => preValue + item.count, 0),
     );
     //2.总价格 所有项的price*count之和
     const allPrice = computed(() =>
-      cartList.value.reduce((preValue, item) => preValue + item.count * item.price, 0)
+      cartList.value.reduce((preValue, item) => preValue + item.count * item.price, 0),
     );
     //单选功能
     const singleCheck = (skuId, selected) => {
@@ -86,13 +86,13 @@ export const useCartStore = defineStore(
     const selectedCount = computed(() =>
       cartList.value
         .filter((item) => item.selected)
-        .reduce((preValue, item) => preValue + item.count, 0)
+        .reduce((preValue, item) => preValue + item.count, 0),
     );
     //2.已选择商品合计
     const selectedPrice = computed(() =>
       cartList.value
         .filter((item) => item.selected)
-        .reduce((preValue, item) => preValue + item.count * item.price, 0)
+        .reduce((preValue, item) => preValue + item.count * item.price, 0),
     );
     return {
       cartList,
@@ -112,5 +112,5 @@ export const useCartStore = defineStore(
   {
     //持久化
     persist: true,
-  }
+  },
 );

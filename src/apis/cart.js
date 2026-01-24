@@ -1,6 +1,5 @@
 //封装购物车相关接口
 import request from "@/utils/http";
-import { onMounted } from "vue";
 //加入购物车
 export const insertCartAPI = ({ skuId, count }) => {
   return request({

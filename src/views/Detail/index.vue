@@ -10,7 +10,7 @@ const goods = ref({});
 const getGoods = async () => {
   const route = useRoute();
   const res = await getDetail(route.params.id);
-  goods.value = res.result;
+  goods.value = res.data.result;
 };
 onMounted(() => {
   getGoods();
