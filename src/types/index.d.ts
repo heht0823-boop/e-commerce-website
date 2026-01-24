@@ -1,6 +1,5 @@
-// src/types/index.d.ts
 declare module "*.vue" {
-  import type { ComponentOptions } from "vue";
-  const component: ComponentOptions;
+  import type { DefineComponent } from "@vue/runtime-core";
+  const component: DefineComponent<{}, {}, any>;
   export default component;
 }

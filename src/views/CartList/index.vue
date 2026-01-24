@@ -1,20 +1,35 @@
+<!-- src/views/CartList/index.vue -->
 <script setup>
 import { useCartStore } from "@/stores/cartStore";
+import { watch } from "vue";
 const cartStore = useCartStore();
 
 //单选回调
 const singleCheck = (selected, i) => {
-  //store cartList 数组 无法知道要修改谁的选中状态
-  //除了selected补充一个参数来筛选
   cartStore.singleCheck(i.skuId, selected);
 };
+
 const allCheck = (selected) => {
   cartStore.allCheck(selected);
 };
+
 //删除购物车
 const delCart = async (item) => {
   await cartStore.delCart(item.skuId);
 };
+
+// 监听购物车状态变化，如果商品数量为0，则自动取消选中
+watch(
+  () => cartStore.cartList,
+  () => {
+    cartStore.cartList.forEach((item) => {
+      if (item.count <= 0) {
+        cartStore.singleCheck(item.skuId, false);
+      }
+    });
+  },
+  { deep: true },
+);
 </script>
 
 <template>
@@ -23,7 +38,6 @@ const delCart = async (item) => {
       <div class="cart">
         <table>
           <thead>
-            ``
             <tr>
               <th width="120">
                 <el-checkbox :model-value="cartStore.isAll" @change="allCheck" />
@@ -35,14 +49,15 @@ const delCart = async (item) => {
               <th width="140">操作</th>
             </tr>
           </thead>
-          <!-- 商品列表 -->
+          <!-- 有效商品列表 -->
           <tbody>
-            <tr v-for="i in cartStore.cartList" :key="i.id">
+            <tr v-for="i in cartStore.effectiveCartList" :key="i.id">
               <td>
                 <!-- 单选框 -->
                 <el-checkbox
                   :model-value="i.selected"
                   @change="(selected) => singleCheck(selected, i)"
+                  :disabled="i.isEffective === false"
                 />
               </td>
               <td>
@@ -59,7 +74,7 @@ const delCart = async (item) => {
                 <p>&yen;{{ i.price }}</p>
               </td>
               <td class="tc">
-                <el-input-number v-model="i.count" />
+                <el-input-number v-model="i.count" :min="1" @change="() => {}" />
               </td>
               <td class="tc">
                 <p class="f16 red">&yen;{{ (i.price * i.count).toFixed(2) }}</p>
@@ -79,7 +94,51 @@ const delCart = async (item) => {
                 </p>
               </td>
             </tr>
-            <tr v-if="cartStore.cartList.length === 0">
+
+            <!-- 无效商品列表 -->
+            <tr v-if="cartStore.invalidCartList.length > 0">
+              <td colspan="6" style="padding: 10px">
+                <div style="background-color: #f5f5f5; padding: 10px; margin-top: 10px">
+                  <h4 style="color: #e4393c">没有库存</h4>
+                </div>
+              </td>
+            </tr>
+
+            <tr v-for="i in cartStore.invalidCartList" :key="i.id">
+              <td>
+                <span style="color: #999">×</span>
+              </td>
+              <td>
+                <div class="goods">
+                  <RouterLink to="/"
+                    ><img :src="i.picture" alt="" style="opacity: 0.5"
+                  /></RouterLink>
+                  <div>
+                    <p class="name ellipsis" style="color: #999">{{ i.name }} (已失效)</p>
+                  </div>
+                </div>
+              </td>
+              <td class="tc">
+                <p style="color: #999">&yen;{{ i.price }}</p>
+              </td>
+              <td class="tc">
+                <p style="color: #999">{{ i.count }}</p>
+              </td>
+              <td class="tc">
+                <p class="f16 red" style="color: #999">&yen;{{ (i.price * i.count).toFixed(2) }}</p>
+              </td>
+              <td class="tc">
+                <p>
+                  <a href="javascript:;" @click="delCart(i)" style="color: #999">删除</a>
+                </p>
+              </td>
+            </tr>
+
+            <tr
+              v-if="
+                cartStore.effectiveCartList.length === 0 && cartStore.invalidCartList.length === 0
+              "
+            >
               <td colspan="6">
                 <div class="cart-none">
                   <el-empty description="购物车列表为空">
@@ -98,9 +157,14 @@ const delCart = async (item) => {
           <span class="red">¥ {{ cartStore.selectedPrice.toFixed(2) }}</span>
         </div>
         <div class="total">
-          <el-button size="large" type="primary" @click="$router.push('/checkout')"
-            >下单结算</el-button
+          <el-button
+            size="large"
+            type="primary"
+            @click="$router.push('/checkout')"
+            :disabled="cartStore.selectedCount === 0"
           >
+            去结算
+          </el-button>
         </div>
       </div>
     </div>

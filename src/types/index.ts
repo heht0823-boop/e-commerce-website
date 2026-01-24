@@ -107,6 +107,12 @@ export interface UserInfo {
   provinceCode: string;
   token: string;
 }
+//登录参数
+export interface LoginParams {
+  account: string;
+  password: string;
+}
+
 //商品详情分类类型
 export type DetailCategories = GoodsChildren[];
 

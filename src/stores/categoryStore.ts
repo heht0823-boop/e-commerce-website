@@ -1,0 +1,17 @@
+import { ref } from "vue";
+import { defineStore } from "pinia";
+import { getCategoryAPI } from "@/apis/layout";
+import type { HeaderChildren } from "@/types";
+
+export const useCategoryStore = defineStore("category", () => {
+  const categoryList = ref<HeaderChildren[]>([]);
+  const getCategory = async () => {
+    try {
+      const res = await getCategoryAPI();
+      categoryList.value = res.data.result;
+    } catch (err: unknown) {
+      console.error("获取分类列表失败", err);
+    }
+  };
+  return { categoryList, getCategory };
+});

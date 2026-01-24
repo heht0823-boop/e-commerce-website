@@ -14,7 +14,7 @@ const addFlag = ref(false); // 添加地址弹窗控制
 const getCheckInfo = async () => {
   try {
     const res = await getCheckInfoAPI();
-    checkInfo.value = res.result;
+    checkInfo.value = res.data.result;
     //默认收货地址
     curAddress.value = checkInfo.value.userAddresses.find((item) => item.isDefault);
   } catch (error) {
