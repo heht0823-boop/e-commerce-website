@@ -4,7 +4,6 @@ import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 import { useUserStore } from "./userStore";
 import { insertCartAPI, findNewCartListAPI, deleteCartAPI } from "../apis/cart";
-import type { CartItem } from "@/types/index";
 
 export const useCartStore = defineStore(
   "cart",
@@ -14,7 +13,7 @@ export const useCartStore = defineStore(
       try {
         const res = await findNewCartListAPI();
         cartList.value = res.data.result;
-      } catch (err: unknown) {
+      } catch (err) {
         console.error("获取最新购物车列表失败", err);
       }
     };
@@ -22,17 +21,16 @@ export const useCartStore = defineStore(
     const isLogin = computed(() => userStore.userInfo.token);
 
     //1.定义state-cartList
-    const cartList = ref<CartItem[]>([]);
+    const cartList = ref([]);
 
     //2.定义action-addCart
-    const addCart = async (goods: CartItem) => {
-      const { skuId, count } = goods;
+    const addCart = async (goods) => {
       if (isLogin.value) {
         //已登录
         try {
-          await insertCartAPI({ skuId, count });
+          await insertCartAPI(goods);
           updateNewList();
-        } catch (err: unknown) {
+        } catch (err) {
           console.error("添加购物车失败", err);
         }
       } else {
@@ -55,13 +53,13 @@ export const useCartStore = defineStore(
     };
 
     //删除购物车
-    const delCart = async (skuId: string) => {
+    const delCart = async (skuId) => {
       if (isLogin.value) {
         //调用接口实现接口购物车的功能实现
         try {
           await deleteCartAPI([skuId]);
           updateNewList();
-        } catch (err: unknown) {
+        } catch (err) {
           console.error("删除购物商品失败", err);
         }
       } else {
@@ -82,20 +80,20 @@ export const useCartStore = defineStore(
 
     //计算属性
     //1.总的数量 所有项的count之和
-    const allCount = computed<number>(() =>
-      cartList.value.reduce<number>((preValue, item) => preValue + item.count, 0),
+    const allCount = computed(
+      () => cartList.value.reduce > ((preValue, item) => preValue + item.count, 0),
     );
 
     //2.总价格 所有项的price*count之和
-    const allPrice = computed<number>(() =>
-      cartList.value.reduce<number>((preValue, item) => {
-        const itemPrice = Number(item.price) ?? 0;
+    const allPrice = computed(() =>
+      cartList.value.reduce((preValue, item) => {
+        const itemPrice = item.price ?? 0;
         return preValue + item.count * itemPrice;
       }, 0),
     );
 
     //单选功能
-    const singleCheck = (skuId: string, selected: boolean) => {
+    const singleCheck = (skuId, selected) => {
       //通过skuId找到要修改的那一项,然后把它的selected修改为传过来的selected
       const item = cartList.value.find((item) => item.skuId === skuId);
       if (item) {
@@ -104,7 +102,7 @@ export const useCartStore = defineStore(
     };
 
     //全选功能
-    const allCheck = (selected: boolean) => {
+    const allCheck = (selected) => {
       //把cartList中的每一项的selected都设置为当前的全选框状态
       cartList.value.forEach((item) => (item.selected = selected));
     };
@@ -118,36 +116,36 @@ export const useCartStore = defineStore(
 
     //计算所有选中的数量和价格 - 只统计有效的商品
     //1.已选择数量
-    const selectedCount = computed<number>(() =>
+    const selectedCount = computed(() =>
       cartList.value
         .filter((item) => item.selected && item.isEffective !== false)
         .reduce((preValue, item) => preValue + item.count, 0),
     );
 
     //2.已选择商品合计
-    const selectedPrice = computed<number>(() =>
+    const selectedPrice = computed(() =>
       cartList.value
         .filter((item) => item.selected && item.isEffective !== false)
         .reduce((preValue, item) => {
-          const itemPrice = Number(item.price) ?? 0;
+          const itemPrice = item.price ?? 0;
           return preValue + item.count * itemPrice;
         }, 0),
     );
 
     // 获取选中的有效商品列表 - 用于结算
-    const selectedGoods = computed<CartItem[]>(() =>
+    const selectedGoods = computed(() =>
       cartList.value.filter(
         (item) => item.selected && item.count > 0 && item.isEffective !== false,
       ),
     );
 
     // 获取有效商品列表 - 用于显示购物车
-    const effectiveCartList = computed<CartItem[]>(() =>
+    const effectiveCartList = computed(() =>
       cartList.value.filter((item) => item.isEffective !== false),
     );
 
     // 获取无效商品列表
-    const invalidCartList = computed<CartItem[]>(() =>
+    const invalidCartList = computed(() =>
       cartList.value.filter((item) => item.isEffective === false),
     );
 

@@ -67,8 +67,7 @@ const createOrder = async () => {
       goods: goods,
       addressId: curAddress.value.id,
     });
-
-    const orderId = res.result.id;
+    const orderId = res?.data?.result?.id;
 
     // 更新购物车
     await cartStore.updateNewList();

@@ -8,6 +8,7 @@ export function useCategoryFilter() {
   const getCategoryData = async () => {
     const res = await getCategoryFilterAPI(route.params.id);
     categoryData.value = res.data.result;
+    console.log(categoryData.value);
   };
   watch(
     () => route.params.id,

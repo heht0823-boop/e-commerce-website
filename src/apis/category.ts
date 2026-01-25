@@ -1,13 +1,21 @@
 import httpInstance from "@/utils/http";
+import type { ApiResponse } from "@/types/index";
+import type {
+  CategoryResponse,
+  SubCategoryResponse,
+  TemporaryData,
+  TemporaryResponse,
+} from "@/types/category";
 
 /**
  * @description: 获取分类数据
  * @param {*} id 分类id
  * @return {*}
  */
-export const getTopCategoryAPI = (id) => {
+export const getTopCategoryAPI = async (id: string): Promise<ApiResponse<CategoryResponse>> => {
   return httpInstance({
     url: "/category",
+    method: "GET",
     params: {
       id,
     },
@@ -19,9 +27,12 @@ export const getTopCategoryAPI = (id) => {
  * @return {*}
  */
 
-export const getCategoryFilterAPI = (id) => {
+export const getCategoryFilterAPI = async (
+  id: string,
+): Promise<ApiResponse<SubCategoryResponse>> => {
   return httpInstance({
     url: "/category/sub/filter",
+    method: "GET",
     params: {
       id,
     },
@@ -38,7 +49,10 @@ export const getCategoryFilterAPI = (id) => {
    }
  * @return {*}
  */
-export const getSubCategoryAPI = (data) => {
+
+export const getSubCategoryAPI = async (
+  data: TemporaryData,
+): Promise<ApiResponse<TemporaryResponse>> => {
   return httpInstance({
     url: "/category/goods/temporary",
     method: "POST",

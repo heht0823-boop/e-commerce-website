@@ -27,8 +27,11 @@
     "src/**/*.d.ts",
     "src/**/*.tsx",
     "src/**/*.vue",
-    "src/apis/cart.js",
-    "src/stores/cartStore.ts"
+    "src/apis/cart.ts",
+    "src/stores/cartStore.js",
+    "src/apis/category.ts",
+    "src/stores/userStore.js",
+    "src/stores/categoryStore.js"
   ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

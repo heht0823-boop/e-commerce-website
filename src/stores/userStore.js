@@ -4,40 +4,19 @@ import { ref, computed } from "vue";
 import { loginAPI } from "@/apis/user";
 import { useCartStore } from "./cartStore";
 import { mergeCartAPI } from "@/apis/cart";
-import type { UserInfo, LoginParams } from "@/types/index";
 export const useUserStore = defineStore(
   "user",
   () => {
     const cartStore = useCartStore();
-    const INITIAL_USER_INFO: UserInfo = {
-      account: "",
-      avatar: "",
-      birthday: "",
-      cityCode: "",
-      gender: "",
-      id: "",
-      mobile: "",
-      nickname: "",
-      profession: "",
-      provinceCode: "",
-      token: "",
-    };
     //1.定义管理用户数据的state
-    const userInfo = ref<UserInfo>({
-      ...INITIAL_USER_INFO,
-    });
-    type CartMergeItem = {
-      skuId: string | number;
-      selected: boolean;
-      count: number;
-    };
+    const userInfo = ref({});
+
     //2.定义获取接口数据的action函数
-    const getUserInfo = async ({ account, password }: LoginParams) => {
+    const getUserInfo = async ({ account, password }) => {
       try {
         const res = await loginAPI({ account, password });
         userInfo.value = res.data.result;
-        console.log(res.data.result);
-        const cartData = cartStore.cartList.map((item): CartMergeItem => {
+        const cartData = cartStore.cartList.map((item) => {
           return {
             skuId: item.skuId,
             selected: item.selected,
@@ -48,14 +27,14 @@ export const useUserStore = defineStore(
         await mergeCartAPI(cartData);
         //更新购物车列表
         await cartStore.updateNewList();
-      } catch (error: unknown) {
+      } catch (error) {
         console.error("登录失败", error);
         throw error;
       }
     };
     //退出时清除用户信息
     const clearUserInfo = () => {
-      userInfo.value = { ...INITIAL_USER_INFO };
+      userInfo.value = {};
       //执行清除购物车的action函数
       cartStore.clearCart();
     };
