@@ -2,8 +2,9 @@
 //通过插件的方式
 import ImageView from "@/components/ImageView/index.vue";
 import Sku from "@/components/XtxSku/index.vue";
+import { App } from "vue";
 export const componentPlugin = {
-  install(app) {
+  install(app: App) {
     //app.component("组件名",组件对象)
     app.component("XtxImageView", ImageView);
     app.component("XtxSku", Sku);

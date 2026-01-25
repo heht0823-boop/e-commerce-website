@@ -1,7 +1,7 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import "element-plus/theme-chalk/el-message.css";
-import { ElMessage } from "element-plus";
+import { ElMessage, FormItemRule, ElForm } from "element-plus";
 import { useRouter } from "vue-router";
 import { useUserStore } from "@/stores/userStore";
 const UserStore = useUserStore();
@@ -13,7 +13,7 @@ const form = ref({
   agree: true,
 });
 //2.准备规则对象
-const rules = {
+const rules: Record<string, FormItemRule[]> = {
   account: [
     {
       required: true,
@@ -47,11 +47,11 @@ const rules = {
   ],
 };
 //3.获取form实例做统一校验
-const formRef = ref(null);
+const formRef = ref<InstanceType<typeof ElForm>>();
 const router = useRouter();
 const dologin = () => {
   const { account, password } = form.value;
-  formRef.value.validate(async (vaild) => {
+  formRef.value?.validate(async (vaild) => {
     //vaild为true表示所有验证通过
     if (vaild) {
       // 登录成功

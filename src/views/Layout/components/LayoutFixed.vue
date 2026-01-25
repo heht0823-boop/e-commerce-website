@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { useScroll } from "@vueuse/core";
 import { useCategoryStore } from "@/stores/categoryStore";
 const categoryStore = useCategoryStore();

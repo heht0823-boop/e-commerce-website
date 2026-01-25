@@ -1,31 +1,38 @@
-<script setup>
+<script setup lang="ts">
 import { getHotGoodsAPI } from "@/apis/detail";
 import { ref, onMounted, computed } from "vue";
 import { useRoute } from "vue-router";
-//设计一个props参数,适配不同的title和数据
+import type { GoodsHotParams, GoodsHotResponse } from "@/types/detail";
 const props = defineProps({
   hotType: {
     type: Number,
+    required: true,
   },
 });
-//适配title 1-24小时热榜 2-周热榜
+
+// 适配title 1-24小时热榜 2-周热榜
 const TYPEMAP = {
   1: "24小时热榜",
   2: "周热榜",
-};
-const title = computed(() => TYPEMAP[props.hotType]);
-//以24小时热榜获取数据渲染模版
-//1.封装接口
-//2.调用接口渲染模版
-const hotList = ref([]);
+} as const;
+
+const title = computed(() => TYPEMAP[props["hotType"] as keyof typeof TYPEMAP]);
+
+// 以24小时热榜获取数据渲染模版
+// 1.封装接口
+// 2.调用接口渲染模版
+const hotList = ref<GoodsHotResponse>([]);
+
 const getHotList = async () => {
   const route = useRoute();
   const res = await getHotGoodsAPI({
-    id: route.params.id,
-    type: props.hotType,
+    id: route.params.id as string,
+    type: props["hotType"] as number,
+    limit: 3, // 默认值
   });
-  hotList.value = res.data.result;
+  hotList.value = res?.data?.result;
 };
+
 onMounted(() => {
   getHotList();
 });

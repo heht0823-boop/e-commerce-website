@@ -1,14 +1,14 @@
-<script setup>
+<script setup lang="ts">
 import { getCheckInfoAPI, createOrderAPI } from "@/apis/checkout";
 import { useRouter } from "vue-router";
 import { onMounted, ref } from "vue";
 import { useCartStore } from "@/stores/cartStore";
 import { ElMessage } from "element-plus";
-
-const checkInfo = ref({}); // 订单对象
+import type { OrderPreResponse, OrderPreUserAddresses } from "@/types/checkout";
+const checkInfo = ref<OrderPreResponse>(); // 订单对象
 const router = useRouter();
 const cartStore = useCartStore();
-const curAddress = ref(null); // 当前选中的地址
+const curAddress = ref<OrderPreUserAddresses>(); // 当前选中的地址
 const addFlag = ref(false); // 添加地址弹窗控制
 
 const getCheckInfo = async () => {
@@ -27,12 +27,12 @@ onMounted(() => {
   getCheckInfo();
 });
 
-const activeAddress = ref({});
+const activeAddress = ref<OrderPreUserAddresses>();
 // 控制弹框打开
 const toggleFlag = ref(false);
 
 // 切换地址
-const switchAddress = (item) => {
+const switchAddress = (item: OrderPreUserAddresses) => {
   activeAddress.value = item;
 };
 
@@ -40,7 +40,19 @@ const switchAddress = (item) => {
 const confirmSwitch = () => {
   curAddress.value = activeAddress.value;
   toggleFlag.value = false;
-  activeAddress.value = {};
+  activeAddress.value = {
+    address: "",
+    addressTags: "",
+    cityCode: "",
+    contact: "",
+    countyCode: "",
+    fullLocation: "",
+    id: "",
+    isDefault: 0,
+    postalCode: "",
+    provinceCode: "",
+    receiver: "",
+  };
 };
 
 // 创建订单
@@ -52,12 +64,11 @@ const createOrder = async () => {
 
   try {
     // 构造订单商品数据
-    const goods = checkInfo.value.goods.map((item) => {
-      return {
+    const goods =
+      checkInfo.value?.goods.map((item) => ({
         skuId: item.skuId,
         count: item.count,
-      };
-    });
+      })) ?? [];
 
     const res = await createOrderAPI({
       deliveryTimeType: 1,
@@ -110,7 +121,7 @@ const createOrder = async () => {
               <el-button
                 size="large"
                 @click="toggleFlag = true"
-                :disabled="!checkInfo.userAddresses || checkInfo.userAddresses.length === 0"
+                :disabled="!checkInfo?.userAddresses || checkInfo?.userAddresses.length === 0"
                 >切换地址</el-button
               >
               <el-button size="large" @click="addFlag = true">添加地址</el-button>
@@ -120,7 +131,7 @@ const createOrder = async () => {
         <!-- 商品信息 -->
         <h3 class="box-title">商品信息</h3>
         <div class="box-body">
-          <table class="goods" v-if="checkInfo.goods && checkInfo.goods.length > 0">
+          <table class="goods" v-if="checkInfo?.goods && checkInfo?.goods.length > 0">
             <thead>
               <tr>
                 <th width="520">商品信息</th>
@@ -170,19 +181,19 @@ const createOrder = async () => {
           <div class="total">
             <dl>
               <dt>商品件数：</dt>
-              <dd>{{ checkInfo.summary?.goodsCount || 0 }}件</dd>
+              <dd>{{ checkInfo?.summary?.goodsCount || 0 }}件</dd>
             </dl>
             <dl>
               <dt>商品总价：</dt>
-              <dd>¥{{ checkInfo.summary?.totalPrice?.toFixed(2) || "0.00" }}</dd>
+              <dd>¥{{ checkInfo?.summary?.totalPrice?.toFixed(2) || "0.00" }}</dd>
             </dl>
             <dl>
               <dt>运<i></i>费：</dt>
-              <dd>¥{{ checkInfo.summary?.postFee?.toFixed(2) || "0.00" }}</dd>
+              <dd>¥{{ checkInfo?.summary?.postFee?.toFixed(2) || "0.00" }}</dd>
             </dl>
             <dl>
               <dt>应付总额：</dt>
-              <dd class="price">¥{{ checkInfo.summary?.totalPayPrice?.toFixed(2) || "0.00" }}</dd>
+              <dd class="price">¥{{ checkInfo?.summary?.totalPayPrice?.toFixed(2) || "0.00" }}</dd>
             </dl>
           </div>
         </div>
@@ -195,12 +206,12 @@ const createOrder = async () => {
   </div>
   <!-- 切换地址 -->
   <el-dialog v-model="toggleFlag" title="切换收货地址" width="30%" center>
-    <div class="addressWrapper" v-if="checkInfo.userAddresses">
+    <div class="addressWrapper" v-if="checkInfo?.userAddresses">
       <div
         class="text item"
-        :class="{ active: activeAddress.id === item.id }"
+        :class="{ active: activeAddress?.id === item.id }"
         @click="switchAddress(item)"
-        v-for="item in checkInfo.userAddresses"
+        v-for="item in checkInfo?.userAddresses"
         :key="item.id"
       >
         <ul>

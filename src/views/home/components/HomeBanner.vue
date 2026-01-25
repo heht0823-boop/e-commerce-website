@@ -1,10 +1,11 @@
-<script setup>
+<script setup lang="ts">
 import { getBannerAPI } from "@/apis/home";
 import { ref } from "vue";
-const bannerList = ref([]);
+import type { BannerResponse } from "@/types/home";
+const bannerList = ref<BannerResponse>();
 const getBanner = async () => {
   const res = await getBannerAPI();
-  bannerList.value = res.data.result;
+  bannerList.value = res?.data?.result;
 };
 getBanner();
 </script>

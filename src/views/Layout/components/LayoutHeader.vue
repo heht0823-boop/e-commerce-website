@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { useCategoryStore } from "@/stores/categoryStore";
 import HeaderCart from "./HeaderCart.vue";
 const categoryStore = useCategoryStore();

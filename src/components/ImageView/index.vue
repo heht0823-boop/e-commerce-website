@@ -1,29 +1,30 @@
-<script setup>
+<script setup lang="ts">
 import { ref, watch } from "vue";
 import { useMouseInElement } from "@vueuse/core";
 //props适配图片列表
-defineProps({
-  imageList: {
-    type: Array,
-    default: () => [],
+const props = withDefaults(
+  defineProps<{
+    imageList: string[];
+  }>(),
+  {
+    imageList: () => [],
   },
-});
+);
 
 //1.小图切换大图显示
-const activeIndex = ref(0);
+const activeIndex = ref<number>(0);
 
-const enterhandler = (i) => {
+const enterhandler = (i: number) => {
   activeIndex.value = i;
 };
 //2.获取鼠标相对位置
-const target = ref(null);
+const target = ref<HTMLElement | null>(null);
 const { elementX, elementY, isOutside } = useMouseInElement(target);
 //3.控制滑块跟随鼠标移动,(监听elementX/Y变化,一旦变化,重新设置left和top)
-const left = ref(0);
-const top = ref(0);
-
-const positionX = ref(0);
-const positionY = ref(0);
+const left = ref<number>(0);
+const top = ref<number>(0);
+const positionX = ref<number>(0);
+const positionY = ref<number>(0);
 watch([elementX, elementY], () => {
   // 如果鼠标没有进入盒子里面,直接不执行后面的逻辑
   if (isOutside.value) return;

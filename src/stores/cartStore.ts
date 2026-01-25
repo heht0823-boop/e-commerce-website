@@ -4,33 +4,34 @@ import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 import { useUserStore } from "./userStore";
 import { insertCartAPI, findNewCartListAPI, deleteCartAPI } from "../apis/cart";
-
+import type { CartItem } from "@/types/cart";
+import { s } from "vue-router/dist/router-CWoNjPRp.mjs";
 export const useCartStore = defineStore(
   "cart",
   () => {
+    //1.定义state-cartList
+    const cartList = ref<CartItem[]>([]);
     //获取最新购物车的列表action
     const updateNewList = async () => {
       try {
         const res = await findNewCartListAPI();
-        cartList.value = res.data.result;
-      } catch (err) {
+        cartList.value = res?.data?.result;
+      } catch (err: unknown) {
         console.error("获取最新购物车列表失败", err);
       }
     };
     const userStore = useUserStore();
     const isLogin = computed(() => userStore.userInfo.token);
 
-    //1.定义state-cartList
-    const cartList = ref([]);
-
     //2.定义action-addCart
-    const addCart = async (goods) => {
+    const addCart = async (goods: CartItem) => {
       if (isLogin.value) {
+        const { count, skuId } = goods;
         //已登录
         try {
-          await insertCartAPI(goods);
+          await insertCartAPI({ count, skuId });
           updateNewList();
-        } catch (err) {
+        } catch (err: unknown) {
           console.error("添加购物车失败", err);
         }
       } else {
@@ -53,13 +54,13 @@ export const useCartStore = defineStore(
     };
 
     //删除购物车
-    const delCart = async (skuId) => {
+    const delCart = async (skuId: string) => {
       if (isLogin.value) {
         //调用接口实现接口购物车的功能实现
         try {
           await deleteCartAPI([skuId]);
           updateNewList();
-        } catch (err) {
+        } catch (err: unknown) {
           console.error("删除购物商品失败", err);
         }
       } else {
@@ -80,20 +81,20 @@ export const useCartStore = defineStore(
 
     //计算属性
     //1.总的数量 所有项的count之和
-    const allCount = computed(
-      () => cartList.value.reduce > ((preValue, item) => preValue + item.count, 0),
+    const allCount = computed(() =>
+      cartList.value.reduce((preValue, item) => preValue + item.count, 0),
     );
 
     //2.总价格 所有项的price*count之和
     const allPrice = computed(() =>
       cartList.value.reduce((preValue, item) => {
         const itemPrice = item.price ?? 0;
-        return preValue + item.count * itemPrice;
+        return preValue + item.count * Number(itemPrice);
       }, 0),
     );
 
     //单选功能
-    const singleCheck = (skuId, selected) => {
+    const singleCheck = (skuId: string, selected: boolean) => {
       //通过skuId找到要修改的那一项,然后把它的selected修改为传过来的selected
       const item = cartList.value.find((item) => item.skuId === skuId);
       if (item) {
@@ -102,7 +103,7 @@ export const useCartStore = defineStore(
     };
 
     //全选功能
-    const allCheck = (selected) => {
+    const allCheck = (selected: boolean) => {
       //把cartList中的每一项的selected都设置为当前的全选框状态
       cartList.value.forEach((item) => (item.selected = selected));
     };
@@ -128,7 +129,7 @@ export const useCartStore = defineStore(
         .filter((item) => item.selected && item.isEffective !== false)
         .reduce((preValue, item) => {
           const itemPrice = item.price ?? 0;
-          return preValue + item.count * itemPrice;
+          return preValue + item.count * Number(itemPrice);
         }, 0),
     );
 

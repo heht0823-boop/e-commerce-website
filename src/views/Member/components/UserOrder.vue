@@ -1,8 +1,13 @@
-<script setup>
+<script setup lang="ts">
 import { getUserOrder } from "@/apis/order";
 import { onMounted, ref } from "vue";
+import type { GetOrderResponse, OrderParams } from "@/types/order";
+interface TabType {
+  name: string;
+  label: string;
+}
 // tab列表
-const tabTypes = [
+const tabTypes: TabType[] = [
   { name: "all", label: "全部订单" },
   { name: "unpay", label: "待付款" },
   { name: "deliver", label: "待发货" },
@@ -12,33 +17,33 @@ const tabTypes = [
   { name: "cancel", label: "已取消" },
 ];
 // 订单列表
-const orderList = ref([]);
-const total = ref(0);
-const params = ref({
+const orderList = ref<GetOrderResponse["items"]>([]);
+const total = ref<number>(0);
+const params = ref<OrderParams>({
   orderState: 0,
   page: 1,
   pageSize: 2,
 });
 const getOrderList = async () => {
   const res = await getUserOrder(params.value);
-  orderList.value = res.data.result.items;
-  total.value = res.data.result.counts;
+  orderList.value = res?.data?.result?.items;
+  total.value = res?.data?.result?.counts;
 };
 onMounted(() => {
   getOrderList();
 });
 //tab切换
-const tabChange = (type) => {
+const tabChange = (type: number) => {
   params.value.orderState = type;
   getOrderList();
 };
 //页数切换
-const pageChange = (page) => {
+const pageChange = (page: number) => {
   params.value.page = page;
   getOrderList();
 };
-const fomartPayState = (payState) => {
-  const stateMap = {
+const fomartPayState = (payState: number) => {
+  const stateMap: Record<number, string> = {
     1: "待付款",
     2: "待发货",
     3: "待收货",
@@ -46,7 +51,7 @@ const fomartPayState = (payState) => {
     5: "已完成",
     6: "已取消",
   };
-  return stateMap[payState];
+  return stateMap[payState] || "未知状态";
 };
 </script>
 
@@ -57,7 +62,7 @@ const fomartPayState = (payState) => {
       <el-tab-pane v-for="item in tabTypes" :key="item.name" :label="item.label" />
 
       <div class="main-container">
-        <div class="holder-container" v-if="orderList.length === 0">
+        <div class="holder-container" v-if="orderList?.length === 0">
           <el-empty description="暂无订单数据" />
         </div>
         <div v-else>

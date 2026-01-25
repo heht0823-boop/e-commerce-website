@@ -1,5 +1,3 @@
-import { st } from "vue-router/dist/router-CWoNjPRp.mjs";
-
 //get,获取分类数据/category(居家,美食,服饰,母婴,个护...)
 // export interface GetCategoryParams {
 //   id: string;

@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 //定义props
 defineProps({
   //主标题

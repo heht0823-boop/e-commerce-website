@@ -1,12 +1,13 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import HomePanel from "./HomePanel.vue";
 import { findNewAPI } from "@/apis/home";
-const newList = ref([]);
+import type { NewResponse } from "@/types/home";
+const newList = ref<NewResponse>();
 
 const getNewList = async () => {
   const res = await findNewAPI();
-  newList.value = res.data.result;
+  newList.value = res?.data?.result;
 };
 getNewList();
 </script>

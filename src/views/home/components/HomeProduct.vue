@@ -1,12 +1,13 @@
-<script setup>
+<script setup lang="ts">
 import HomePanel from "./HomePanel.vue";
 import { ref } from "vue";
 import { getGoodsAPI } from "@/apis/home";
 import GoodsItem from "@/views/home/components/GoodsItem.vue";
-const goodsProduct = ref([]);
+import type { HomeGoodsResponse } from "@/types/home";
+const goodsProduct = ref<HomeGoodsResponse>();
 const getGoodsProduct = async () => {
   const res = await getGoodsAPI();
-  goodsProduct.value = res.data.result;
+  goodsProduct.value = res?.data?.result;
 };
 getGoodsProduct();
 </script>

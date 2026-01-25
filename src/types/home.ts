@@ -26,6 +26,7 @@ export interface HomeGoods {
   goods: CategoryChildGoods[];
   id: string;
   name: string;
+  picture: string;
   saleInfo: string;
 }
 export type HomeGoodsResponse = HomeGoods[];

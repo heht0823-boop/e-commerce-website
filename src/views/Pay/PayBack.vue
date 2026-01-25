@@ -7,7 +7,6 @@ const orderInfo = ref({});
 
 const getOrderInfo = async () => {
   const res = await getOrderAPI(route.query.id);
-  console.log(res);
   orderInfo.value = res.data.result;
 };
 onMounted(() => {

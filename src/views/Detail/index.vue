@@ -1,47 +1,83 @@
-<script setup>
+<script setup lang="ts">
 import DetailHot from "@/views/Detail/components/DetailHot.vue";
 import { getDetail } from "@/apis/detail";
 import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { ElMessage } from "element-plus";
 import { useCartStore } from "@/stores/cartStore";
+import type { GoodsResponse } from "@/types/detail";
+import type { CartItem } from "@/types/cart";
 const cartStore = useCartStore();
-const goods = ref({});
+const goods = ref<GoodsResponse>();
 const getGoods = async () => {
   const route = useRoute();
-  const res = await getDetail(route.params.id);
+  const res = await getDetail(route.params.id as string);
   goods.value = res.data.result;
 };
+
 onMounted(() => {
   getGoods();
 });
+interface SkuObjData {
+  inventory: number;
+  oldPrice: string;
+  price: string;
+  skuId: string;
+  specsText: string;
+}
 
-let skuObj = {};
+let skuObj: SkuObjData;
 //sku规格被操作时
-const skuChange = (sku) => {
+const skuChange = (sku: SkuObjData) => {
   skuObj = sku;
 };
+
 //count
 const count = ref(1);
-const countChange = (count) => {
+const countChange = (count: number) => {
   console.log(count);
 };
+// 转换函数：把商品详情(GoodsResponse) 转成购物车项(CartItem)
+const convertGoodsToCartItem = (
+  goods: GoodsResponse,
+  skuId: string,
+  specsText: string,
+  count: number,
+): CartItem => {
+  return {
+    // 1. 从 goods 直接映射的字段
+    id: goods.id,
+    name: goods.name,
+    price: goods.price,
+    discount: goods.discount,
+    isCollect: goods.isCollect,
+    stock: goods.inventory,
+    picture: goods.mainPictures && goods.mainPictures.length > 0 ? goods.mainPictures[0] : "", // 取第一张主图，空值容错
+
+    // 2. 购物车特有字段，从 goods 加工得到
+    nowPrice: goods.price, // 当前售价默认和商品售价一致
+    nowOriginalPrice: goods.oldPrice, // 原价对应商品的 oldPrice
+
+    // 3. 从函数参数传入的字段（购物车需要的规格信息）
+    skuId: skuId,
+    attrsText: specsText,
+    count: count,
+
+    // 4. 购物车状态字段，给合理默认值
+    selected: true, // 加入购物车默认选中
+    isEffective: goods.inventory > 0, // 有库存则有效
+    postFee: 0, // 默认包邮
+    specs: [], // 规格数组暂时留空占位
+  };
+};
 //添加购物车
-const addCart = () => {
+const addCart = (goods: GoodsResponse) => {
   if (skuObj.skuId) {
-    //触发action函数
-    cartStore.addCart({
-      id: goods.value.id, //商品Id
-      name: goods.value.name, //商品名称
-      picture: goods.value.mainPictures[0], //图片
-      price: goods.value.price, //价格
-      count: count.value, //数量
-      skuId: skuObj.skuId, //skuId
-      attrsText: skuObj.specsText, //规格
-      selected: true, //是否选中
-    });
+    // 先转换为 CartItem 类型
+    const cartItem = convertGoodsToCartItem(goods, skuObj.skuId, skuObj.specsText, count.value);
+    // 此时传入的是完整的 CartItem，不会报错
+    cartStore.addCart(cartItem);
   } else {
-    //规格没有选择,警告框
     ElMessage.warning("请选择商品规格");
   }
 };
@@ -49,7 +85,7 @@ const addCart = () => {
 
 <template>
   <div class="xtx-goods-page">
-    <div class="container" v-if="goods.details">
+    <div class="container" v-if="goods?.details">
       <div class="bread-container">
         <el-breadcrumb separator=">">
           <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
@@ -57,53 +93,53 @@ const addCart = () => {
           解决办法:
           1.可选链的语法?.
           2.v-if手动控制渲染时机,保证只有数据存在才渲染 -->
-          <el-breadcrumb-item :to="{ path: `/category${goods.categories[1].id}` }">{{
-            goods.categories[1].name
+          <el-breadcrumb-item :to="{ path: `/category${goods?.categories[1].id}` }">{{
+            goods?.categories[1].name
           }}</el-breadcrumb-item>
-          <el-breadcrumb-item :to="{ path: `/category/sub/${goods.categories[0].id}` }"
-            >{{ goods.categories[0].name }}
+          <el-breadcrumb-item :to="{ path: `/category/sub/${goods?.categories[0].id}` }"
+            >{{ goods?.categories[0].name }}
           </el-breadcrumb-item>
-          <el-breadcrumb-item>{{ goods.name }}</el-breadcrumb-item>
+          <el-breadcrumb-item>{{ goods?.name }}</el-breadcrumb-item>
         </el-breadcrumb>
       </div>
       <!-- 商品信息 -->
       <div class="info-container">
         <div>
           <div class="goods-info">
-            <div class="media" v-if="goods.brand">
+            <div class="media" v-if="goods?.brand">
               <!-- 图片预览区 -->
-              <XtxImageView :image-list="goods.mainPictures" />
+              <XtxImageView :image-list="goods?.mainPictures" />
               <!-- 统计数量 -->
               <ul class="goods-sales">
                 <li>
                   <p>销量人气</p>
-                  <p>{{ goods.salesCount }}+</p>
+                  <p>{{ goods?.salesCount }}+</p>
                   <p><i class="iconfont icon-task-filling"></i>销量人气</p>
                 </li>
                 <li>
-                  <p>{{ goods.commentCount }}+</p>
+                  <p>{{ goods?.commentCount }}+</p>
                   <p>200+</p>
                   <p><i class="iconfont icon-comment-filling"></i>查看评价</p>
                 </li>
                 <li>
                   <p>收藏人气</p>
-                  <p>{{ goods.collectCount }}+</p>
+                  <p>{{ goods?.collectCount }}+</p>
                   <p><i class="iconfont icon-favorite-filling"></i>收藏商品</p>
                 </li>
                 <li>
                   <p>品牌信息</p>
-                  <p>{{ goods.brand.name }}+</p>
+                  <p>{{ goods?.brand.name }}+</p>
                   <p><i class="iconfont icon-dynamic-filling"></i>品牌主页</p>
                 </li>
               </ul>
             </div>
             <div class="spec">
               <!-- 商品信息区 -->
-              <p class="g-name">{{ goods.name }}</p>
-              <p class="g-desc">{{ goods.desc }}</p>
+              <p class="g-desc">{{ goods?.desc }}</p>
+              <p class="g-name">{{ goods?.name }}</p>
               <p class="g-price">
-                <span>{{ goods.oldPrice }}</span>
-                <span> {{ goods.price }}</span>
+                <span>{{ goods?.oldPrice }}</span>
+                <span> {{ goods?.price }}</span>
               </p>
               <div class="g-service">
                 <dl>

@@ -12,7 +12,7 @@ import type { ApiResponse } from "@/types/index";
 export const insertCartAPI = async ({
   skuId,
   count,
-}: AddCartData): Promise<ApiResponse<CartItem>> => {
+}: AddCartData): Promise<ApiResponse<CartItem[]>> => {
   return request({
     url: "/member/cart",
     method: "POST",
@@ -34,7 +34,7 @@ export const deleteCartAPI = async (ids: string[]): Promise<ApiResponse<DeleteCa
 };
 
 //获取最新的购物车列表
-export const findNewCartListAPI = async (): Promise<ApiResponse<CartItem>> => {
+export const findNewCartListAPI = async (): Promise<ApiResponse<CartItem[]>> => {
   return request({
     url: "/member/cart",
     method: "GET",
@@ -42,7 +42,7 @@ export const findNewCartListAPI = async (): Promise<ApiResponse<CartItem>> => {
 };
 //合并购物车
 export const mergeCartAPI = async (
-  data: MergeCartData,
+  data: MergeCartData[],
 ): Promise<ApiResponse<MergeCartResponse>> => {
   return request({
     url: "/member/cart/merge",

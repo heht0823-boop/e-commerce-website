@@ -1,11 +1,12 @@
-<script setup>
+<script setup lang="ts">
 import HomePanel from "./HomePanel.vue";
 import { getHotAPI } from "@/apis/home";
 import { ref } from "vue";
-const hotList = ref([]);
+import type { HotResponse } from "@/types/home";
+const hotList = ref<HotResponse>();
 const getHotList = async () => {
   const res = await getHotAPI();
-  hotList.value = res.data.result;
+  hotList.value = res?.data?.result;
 };
 getHotList();
 </script>

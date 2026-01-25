@@ -1,10 +1,8 @@
-<script setup>
-defineProps({
-  goods: {
-    type: Object,
-    default: () => {},
-  },
-});
+<script setup lang="ts">
+import type { CategoryChildGoods } from "@/types/category";
+defineProps<{
+  goods: CategoryChildGoods;
+}>();
 </script>
 
 <template>
