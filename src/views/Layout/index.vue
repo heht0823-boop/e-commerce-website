@@ -1,9 +1,13 @@
 <script setup lang="ts">
-import LayoutNav from "./components/LayoutNav.vue";
-import LayoutHeader from "./components/LayoutHeader.vue";
-import LayoutFooter from "./components/LayoutFooter.vue";
-import LayoutFixed from "./components/LayoutFixed.vue";
-import { onMounted } from "vue";
+import { onMounted, defineAsyncComponent } from "vue";
+const LayoutNav = defineAsyncComponent(() => import("@/views/Layout/components/LayoutNav.vue"));
+const LayoutHeader = defineAsyncComponent(
+  () => import("@/views/Layout/components/LayoutHeader.vue"),
+);
+const LayoutFooter = defineAsyncComponent(
+  () => import("@/views/Layout/components/LayoutFooter.vue"),
+);
+const LayoutFixed = defineAsyncComponent(() => import("@/views/Layout/components/LayoutFixed.vue"));
 import { useCategoryStore } from "@/stores/categoryStore";
 const categoryStore = useCategoryStore();
 onMounted(() => {

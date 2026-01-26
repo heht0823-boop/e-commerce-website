@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import DetailHot from "@/views/Detail/components/DetailHot.vue";
 import { getDetail } from "@/apis/detail";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, defineAsyncComponent } from "vue";
 import { useRoute } from "vue-router";
 import { ElMessage } from "element-plus";
 import { useCartStore } from "@/stores/cartStore";
 import type { GoodsResponse } from "@/types/detail";
 import type { CartItem } from "@/types/cart";
+//懒加载DetailHot组件
+const DetailHot = defineAsyncComponent(() => import("@/views/Detail/components/DetailHot.vue"));
 const cartStore = useCartStore();
 const goods = ref<GoodsResponse>();
 const getGoods = async () => {

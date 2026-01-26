@@ -1,4 +1,9 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { defineAsyncComponent } from "vue";
+//懒加载用户信息和订单组件
+const UserInfo = defineAsyncComponent(() => import("@/views/Member/components/UserInfo.vue"));
+const UserOrder = defineAsyncComponent(() => import("@/views/Member/components/UserOrder.vue"));
+</script>
 
 <template>
   <div class="container">
@@ -15,8 +20,10 @@
       </div>
     </div>
     <div class="article">
-      <!-- 三级路由的挂载点 -->
-      <RouterView />
+      <!-- 三级路由的挂载点 -根据当前路由动态加载组件 -->
+      <UserInfo v-if="$route.path === '/member'" />
+      <UserOrder v-else-if="$route.path === '/member/order'" />
+      <RouterView v-else />
     </div>
   </div>
 </template>

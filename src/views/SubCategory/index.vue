@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import GoodsItem from "@/views/home/components/GoodsItem.vue";
 import { useCategoryFilter } from "@/views/SubCategory/composables/useCategoryFilter";
 import { useSubCategory } from "@/views/SubCategory/composables/useSubCategory";
-import { ref, nextTick } from "vue";
+import { ref, nextTick, defineAsyncComponent } from "vue";
 import type { ComponentPublicInstance } from "vue";
+const GoodsItem = defineAsyncComponent(() => import("@/views/home/components/GoodsItem.vue"));
 
 const { categoryData, loading: categoryLoading } = useCategoryFilter();
 const {
