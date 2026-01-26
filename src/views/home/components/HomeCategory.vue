@@ -7,11 +7,17 @@ const categoryStore = useCategoryStore();
   <div class="home-category">
     <ul class="menu">
       <li v-for="item in categoryStore.categoryList" :key="item.id">
-        <RouterLink to="/">{{ item.name }}</RouterLink>
-        <RouterLink v-for="i in item.children.slice(0, 2)" :key="i.id" to="/">{{
-          i.name
-        }}</RouterLink>
-        <!-- 弹层layer位置 -->
+        <!-- 主分类 -->
+        <RouterLink to="/" class="main-link">{{ item.name }}</RouterLink>
+
+        <!-- 子分类 -->
+        <span class="sub-links">
+          <RouterLink v-for="i in item.children.slice(0, 2)" :key="i.id" to="/">
+            {{ i.name }}
+          </RouterLink>
+        </span>
+
+        <!-- 弹层 -->
         <div class="layer">
           <h4>分类推荐 <small>根据您的购买或浏览记录推荐</small></h4>
           <ul>
@@ -31,7 +37,6 @@ const categoryStore = useCategoryStore();
     </ul>
   </div>
 </template>
-
 <style scoped lang="scss">
 .home-category {
   width: 250px;
@@ -39,23 +44,41 @@ const categoryStore = useCategoryStore();
   background: rgba(0, 0, 0, 0.8);
   position: relative;
   z-index: 99;
+  @media (max-width: 768px) {
+    display: none;
+  }
 
   .menu {
     li {
       padding-left: 40px;
       height: 55px;
       line-height: 55px;
+      overflow: hidden; /* 关键：隐藏溢出内容 */
+      white-space: nowrap; /* 不换行 */
+      text-overflow: ellipsis; /* 溢出显示省略号 */
 
       &:hover {
         background: $xtxColor;
       }
 
-      a {
+      .main-link {
         margin-right: 4px;
         color: #fff;
+        font-size: 16px;
+      }
 
-        &:first-child {
-          font-size: 16px;
+      .sub-links {
+        display: inline-block;
+        margin-right: 4px;
+        color: #ccc;
+        font-size: 14px;
+
+        a {
+          margin-right: 8px;
+          color: #ccc;
+          &:last-child {
+            margin-right: 0;
+          }
         }
       }
 
@@ -83,6 +106,7 @@ const categoryStore = useCategoryStore();
         ul {
           display: flex;
           flex-wrap: wrap;
+          gap: 10px;
 
           li {
             width: 310px;
@@ -141,7 +165,6 @@ const categoryStore = useCategoryStore();
         }
       }
 
-      // 关键样式  hover状态下的layer盒子变成block
       &:hover {
         .layer {
           display: block;

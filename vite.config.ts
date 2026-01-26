@@ -14,7 +14,11 @@ export default defineConfig({
   css: {
     preprocessorOptions: {
       scss: {
-        additionalData: '@use "@/styles/var.scss" as *;',
+        // 自动引入 var.scss 和 breakPoints.scss，多个文件用换行符分隔
+        additionalData: `
+          @use "@/styles/var.scss" as *;
+          @use "@/styles/breakPoints.scss" as *;
+        `,
       },
     },
   },

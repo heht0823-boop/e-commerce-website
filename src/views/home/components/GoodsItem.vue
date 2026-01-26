@@ -17,37 +17,54 @@ defineProps<{
 <style scoped lang="scss">
 .goods-item {
   display: block;
-  width: 220px;
-  padding: 20px 30px;
+  width: 100%;
+  padding: 10px;
+  margin: 0 auto;
   text-align: center;
-  transition: all 0.5s;
+  transition: all 0.3s ease;
+  height: 100%; // 填满容器高度
 
   &:hover {
-    transform: translate3d(0, -3px, 0);
-    box-shadow: 0 3px 8px rgb(0 0 0 / 20%);
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
   }
 
   img {
-    width: 160px;
-    height: 160px;
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
   }
 
   p {
-    padding-top: 10px;
+    padding-top: 8px;
+    margin: 0;
   }
 
   .name {
-    font-size: 16px;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.4;
   }
 
   .desc {
     color: #999;
-    height: 29px;
+    font-size: 12px;
+    height: auto;
+    line-height: 1.4;
   }
 
   .price {
     color: $priceColor;
-    font-size: 20px;
+    font-size: 16px;
+    font-weight: bold;
   }
 }
+
+// 移除固定宽度，让Grid控制布局
+// @include pc {
+//   .goods-item {
+//     width: 220px; // 删除此行
+//     ...
+//   }
+// }
 </style>

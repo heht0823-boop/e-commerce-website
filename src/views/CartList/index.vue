@@ -2,7 +2,10 @@
 <script setup>
 import { useCartStore } from "@/stores/cartStore";
 import { watch } from "vue";
+import { useBreakpoint } from "@/composables/useBreakpoint";
+
 const cartStore = useCartStore();
+const { isMobile, isPc } = useBreakpoint();
 
 //单选回调
 const singleCheck = (selected, i) => {
@@ -36,8 +39,8 @@ watch(
   <div class="xtx-cart-page">
     <div class="container m-top-20">
       <div class="cart">
-        <table>
-          <thead>
+        <table :class="{ 'mobile-table': isMobile, 'pc-table': isPc }">
+          <thead v-if="isPc">
             <tr>
               <th width="120">
                 <el-checkbox :model-value="cartStore.isAll" @change="allCheck" />
@@ -180,84 +183,10 @@ watch(
     color: #666;
 
     table {
+      width: 100%;
       border-spacing: 0;
       border-collapse: collapse;
       line-height: 24px;
-
-      th,
-      td {
-        padding: 10px;
-        border-bottom: 1px solid #f5f5f5;
-
-        &:first-child {
-          text-align: left;
-          padding-left: 30px;
-          color: #999;
-        }
-      }
-
-      th {
-        font-size: 16px;
-        font-weight: normal;
-        line-height: 50px;
-      }
-    }
-  }
-
-  .cart-none {
-    text-align: center;
-    padding: 120px 0;
-    background: #fff;
-
-    p {
-      color: #999;
-      padding: 20px 0;
-    }
-  }
-
-  .tc {
-    text-align: center;
-
-    a {
-      color: $xtxColor;
-    }
-
-    .xtx-numbox {
-      margin: 0 auto;
-      width: 120px;
-    }
-  }
-
-  .red {
-    color: $priceColor;
-  }
-
-  .green {
-    color: $xtxColor;
-  }
-
-  .f16 {
-    font-size: 16px;
-  }
-
-  .goods {
-    display: flex;
-    align-items: center;
-
-    img {
-      width: 100px;
-      height: 100px;
-    }
-
-    > div {
-      width: 280px;
-      font-size: 16px;
-      padding-left: 10px;
-
-      .attr {
-        font-size: 14px;
-        color: #999;
-      }
     }
   }
 
@@ -265,34 +194,101 @@ watch(
     display: flex;
     background: #fff;
     margin-top: 20px;
-    height: 80px;
-    align-items: center;
-    font-size: 16px;
-    justify-content: space-between;
-    padding: 0 30px;
+    height: auto;
+    align-items: stretch;
+    flex-direction: column; // 手机端默认纵向排列
+  }
+}
 
-    .xtx-checkbox {
-      color: #999;
-    }
+// 手机端样式（＜768px）
+@include mobile {
+  .xtx-cart-page {
+    .cart {
+      table.mobile-table {
+        display: block;
 
-    .batch {
-      a {
-        margin-left: 20px;
+        thead,
+        tbody,
+        tr {
+          display: block;
+        }
+
+        tr {
+          display: flex;
+          flex-direction: column;
+          border-bottom: 1px solid #f5f5f5;
+          margin-bottom: 10px;
+
+          td,
+          th {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: none;
+
+            &:first-child {
+              padding-left: 15px;
+            }
+          }
+        }
       }
     }
 
-    .red {
-      font-size: 18px;
-      margin-right: 20px;
-      font-weight: bold;
+    .action {
+      .batch {
+        padding: 15px;
+        border-bottom: 1px solid #f5f5f5;
+      }
+
+      .total {
+        padding: 15px;
+      }
     }
   }
+}
 
-  .tit {
-    color: #666;
-    font-size: 16px;
-    font-weight: normal;
-    line-height: 50px;
+// PC 端样式（≥768px）
+@include pc {
+  .xtx-cart-page {
+    .cart {
+      table.pc-table {
+        thead,
+        tbody,
+        tr,
+        th,
+        td {
+          display: table-cell;
+        }
+
+        th,
+        td {
+          padding: 10px;
+          border-bottom: 1px solid #f5f5f5;
+
+          &:first-child {
+            text-align: left;
+            padding-left: 30px;
+            color: #999;
+          }
+        }
+      }
+    }
+
+    .action {
+      flex-direction: row; // PC 端横向排列
+      height: 80px;
+      align-items: center;
+
+      .batch {
+        border-bottom: none;
+        padding: 0;
+      }
+
+      .total {
+        padding: 0 30px;
+        margin-left: auto;
+      }
+    }
   }
 }
 </style>

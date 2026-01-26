@@ -71,10 +71,14 @@
 
   .contact {
     background: #fff;
+    margin-bottom: 0; // 移除多余间距
 
     .container {
       padding: 60px 0 40px 25px;
       display: flex;
+      max-width: 1200px;
+      margin: 0 auto;
+      overflow: hidden; // 防止内容溢出
     }
 
     dl {

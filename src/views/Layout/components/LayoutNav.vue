@@ -84,4 +84,21 @@ const myOrder = () => {
     }
   }
 }
+// 在导航栏中加入响应式菜单隐藏逻辑
+.nav-menu {
+  display: none;
+
+  @include pc {
+    display: flex;
+    gap: 20px;
+  }
+
+  @include desktop {
+    gap: 30px;
+  }
+
+  @include large-screen {
+    gap: 40px;
+  }
+}
 </style>

@@ -1,0 +1,30 @@
+$--mobile: 768px !default; // 二端分界点（手机端＜768px，PC 端≥768px）
+$--mobile-1: $--mobile - 1px; // 新增：定义移动端临界值（767px）
+$--desktop: 1200px !default;
+$--large-screen: 1920px !default;
+//媒体查询混合宏
+//<768px(手机端)
+@mixin mobile {
+  @media (max-width: $--mobile-1) {
+    @content;
+  }
+}
+//≥768px(PC 端)
+@mixin pc {
+  @media (min-width: $--mobile) {
+    @content;
+  }
+}
+
+// 新增中屏电脑 mixin
+@mixin desktop {
+  @media (min-width: $--desktop) {
+    @content;
+  }
+}
+// 新增大屏电脑 mixin
+@mixin large-screen {
+  @media (min-width: $--large-screen) {
+    @content;
+  }
+}

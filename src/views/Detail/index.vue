@@ -1,3 +1,4 @@
+<!-- src/views/Detail/index.vue -->
 <script setup lang="ts">
 import { getDetail } from "@/apis/detail";
 import { ref, onMounted, defineAsyncComponent } from "vue";
@@ -6,10 +7,14 @@ import { ElMessage } from "element-plus";
 import { useCartStore } from "@/stores/cartStore";
 import type { GoodsResponse } from "@/types/detail";
 import type { CartItem } from "@/types/cart";
+import { useBreakpoint } from "@/composables/useBreakpoint";
+
 //懒加载DetailHot组件
 const DetailHot = defineAsyncComponent(() => import("@/views/Detail/components/DetailHot.vue"));
 const cartStore = useCartStore();
 const goods = ref<GoodsResponse>();
+const { isMobile, isPc } = useBreakpoint();
+
 const getGoods = async () => {
   const route = useRoute();
   const res = await getDetail(route.params.id as string);
@@ -19,6 +24,7 @@ const getGoods = async () => {
 onMounted(() => {
   getGoods();
 });
+
 interface SkuObjData {
   inventory: number;
   oldPrice: string;
@@ -64,7 +70,7 @@ const convertGoodsToCartItem = (
     attrsText: specsText,
     count: count,
 
-    // 4. 购物车状态字段，给合理默认值
+    // 4. 购车状态字段，给合理默认值
     selected: true, // 加入购物车默认选中
     isEffective: goods.inventory > 0, // 有库存则有效
     postFee: 0, // 默认包邮
@@ -106,12 +112,12 @@ const addCart = (goods: GoodsResponse) => {
       <!-- 商品信息 -->
       <div class="info-container">
         <div>
-          <div class="goods-info">
+          <div class="goods-info" :class="{ 'mobile-layout': isMobile, 'pc-layout': isPc }">
             <div class="media" v-if="goods?.brand">
               <!-- 图片预览区 -->
               <XtxImageView :image-list="goods?.mainPictures" />
               <!-- 统计数量 -->
-              <ul class="goods-sales">
+              <ul class="goods-sales" v-if="isPc">
                 <li>
                   <p>销量人气</p>
                   <p>{{ goods?.salesCount }}+</p>
@@ -167,7 +173,7 @@ const addCart = (goods: GoodsResponse) => {
               </div>
             </div>
           </div>
-          <div class="goods-footer">
+          <div class="goods-footer" :class="{ 'mobile-layout': isMobile, 'pc-layout': isPc }">
             <div class="goods-article">
               <!-- 商品详情 -->
               <div class="goods-tabs">
@@ -188,7 +194,7 @@ const addCart = (goods: GoodsResponse) => {
               </div>
             </div>
             <!-- 24热榜+专题推荐 -->
-            <div class="goods-aside">
+            <div class="goods-aside" v-if="isPc">
               <DetailHot :hot-type="1"> </DetailHot>
               <DetailHot :hot-type="2"> </DetailHot>
             </div>
@@ -205,43 +211,195 @@ const addCart = (goods: GoodsResponse) => {
     min-height: 600px;
     background: #fff;
     display: flex;
+    flex-direction: column; // 移动端垂直布局
+
+    @include pc {
+      flex-direction: row; // PC端水平布局
+    }
 
     .media {
-      width: 580px;
-      height: 600px;
-      padding: 30px 50px;
+      width: 100%;
+      height: auto;
+      padding: 15px; // 移动端内边距
+
+      @include pc {
+        width: 580px;
+        height: 600px;
+        padding: 30px 50px;
+      }
+
+      .goods-sales {
+        display: flex;
+        width: 100%;
+        align-items: center;
+        text-align: center;
+        height: auto; // 移动端自适应高度
+        flex-wrap: wrap;
+
+        @include pc {
+          width: 400px;
+          height: 140px;
+          flex-wrap: nowrap;
+        }
+
+        li {
+          flex: 1 1 50%; // 移动端两列
+          position: relative;
+          margin-bottom: 10px;
+
+          @include pc {
+            flex: 1 0 auto; // PC端平均分布
+            margin-bottom: 0;
+          }
+
+          ~ li::after {
+            display: none; // 移动端去掉分割线
+
+            @include pc {
+              position: absolute;
+              top: 10px;
+              left: 0;
+              height: 60px;
+              border-left: 1px solid #e4e4e4;
+              content: "";
+            }
+          }
+
+          p {
+            &:first-child {
+              color: #999;
+              font-size: 12px; // 移动端字体更小
+
+              @include pc {
+                font-size: inherit;
+              }
+            }
+
+            &:nth-child(2) {
+              color: $priceColor;
+              margin-top: 5px; // 移动端间距更小
+
+              @include pc {
+                margin-top: 10px;
+              }
+            }
+
+            &:last-child {
+              color: #666;
+              margin-top: 5px; // 移动端间距更小
+
+              @include pc {
+                margin-top: 10px;
+              }
+
+              i {
+                color: $xtxColor;
+                font-size: 12px; // 移动端图标更小
+                margin-right: 2px;
+
+                @include pc {
+                  font-size: 14px;
+                }
+
+                &:hover {
+                  color: $xtxColor;
+                  cursor: pointer;
+                }
+              }
+
+              &:hover {
+                color: $xtxColor;
+                cursor: pointer;
+              }
+            }
+          }
+        }
+      }
     }
 
     .spec {
       flex: 1;
-      padding: 30px 30px 30px 0;
+      padding: 15px; // 移动端内边距
+
+      @include pc {
+        padding: 30px 30px 30px 0;
+      }
     }
   }
 
   .goods-footer {
     display: flex;
+    flex-direction: column;
     margin-top: 20px;
 
+    @include pc {
+      flex-direction: row;
+    }
+
+    @include desktop {
+      margin-top: 30px;
+    }
+
+    @include large-screen {
+      margin-top: 40px;
+    }
+
     .goods-article {
-      width: 940px;
-      margin-right: 20px;
+      width: 100%;
+      margin-right: 0;
+
+      @include pc {
+        width: 940px;
+        margin-right: 20px;
+      }
+
+      @include desktop {
+        width: 1000px;
+        margin-right: 30px;
+      }
+
+      @include large-screen {
+        width: 1100px;
+        margin-right: 40px;
+      }
     }
 
     .goods-aside {
-      width: 280px;
-      min-height: 1000px;
+      width: 100%;
+      min-height: auto;
+
+      @include pc {
+        width: 280px;
+        min-height: 1000px;
+      }
+
+      @include desktop {
+        width: 300px;
+      }
+
+      @include large-screen {
+        width: 350px;
+      }
     }
   }
 
   .goods-tabs {
-    min-height: 600px;
+    min-height: 300px; // 移动端自适应高度
     background: #fff;
+
+    @include pc {
+      min-height: 600px; // PC端固定高度
+    }
   }
 
   .goods-warn {
-    min-height: 600px;
+    min-height: 300px; // 移动端自适应高度
     background: #fff;
     margin-top: 20px;
+
+    @include pc {
+      min-height: 600px; // PC端固定高度
+    }
   }
 
   .number-box {
@@ -256,12 +414,17 @@ const addCart = (goods: GoodsResponse) => {
   }
 
   .g-name {
-    font-size: 22px;
+    font-size: 18px; // 移动端字体更小
+
+    @include pc {
+      font-size: 22px; // PC端字体更大
+    }
   }
 
   .g-desc {
     color: #999;
     margin-top: 10px;
+    font-size: 14px; // 移动端字体更小
   }
 
   .g-price {
@@ -276,31 +439,57 @@ const addCart = (goods: GoodsResponse) => {
       &:first-child {
         color: $priceColor;
         margin-right: 10px;
-        font-size: 22px;
+        font-size: 18px; // 移动端字体更小
+
+        @include pc {
+          font-size: 22px; // PC端字体更大
+        }
       }
 
       &:last-child {
         color: #999;
         text-decoration: line-through;
-        font-size: 16px;
+        font-size: 14px; // 移动端字体更小
+
+        @include pc {
+          font-size: 16px; // PC端字体更大
+        }
       }
     }
   }
 
   .g-service {
     background: #f5f5f5;
-    width: 500px;
-    padding: 20px 10px 0 10px;
+    width: 100%; // 移动端占满宽度
+    padding: 15px; // 移动端内边距
     margin-top: 10px;
 
+    @include pc {
+      width: 500px; // PC端固定宽度
+      padding: 20px 10px 0 10px;
+    }
+
     dl {
-      padding-bottom: 20px;
+      padding-bottom: 15px; // 移动端间距更小
       display: flex;
-      align-items: center;
+      flex-direction: column; // 移动端垂直布局
+      align-items: flex-start; // 左对齐
+
+      @include pc {
+        padding-bottom: 20px; // PC端间距更大
+        flex-direction: row; // PC端水平布局
+        align-items: center; // 垂直居中
+      }
 
       dt {
-        width: 50px;
+        width: auto; // 移动端自适应宽度
         color: #999;
+        margin-bottom: 5px; // 移动端下边距
+
+        @include pc {
+          width: 50px; // PC端固定宽度
+          margin-bottom: 0; // PC端无下边距
+        }
       }
 
       dd {
@@ -308,7 +497,15 @@ const addCart = (goods: GoodsResponse) => {
 
         &:last-child {
           span {
-            margin-right: 10px;
+            display: block; // 移动端块级显示
+            margin-right: 0; // 移动端无右边距
+            margin-bottom: 5px; // 移动端下边距
+
+            @include pc {
+              display: inline; // PC端行内显示
+              margin-right: 10px; // PC端右边距
+              margin-bottom: 0; // PC端无下边距
+            }
 
             &::before {
               content: "•";
@@ -324,97 +521,86 @@ const addCart = (goods: GoodsResponse) => {
       }
     }
   }
-
-  .goods-sales {
-    display: flex;
-    width: 400px;
-    align-items: center;
-    text-align: center;
-    height: 140px;
-
-    li {
-      flex: 1;
-      position: relative;
-
-      ~ li::after {
-        position: absolute;
-        top: 10px;
-        left: 0;
-        height: 60px;
-        border-left: 1px solid #e4e4e4;
-        content: "";
-      }
-
-      p {
-        &:first-child {
-          color: #999;
-        }
-
-        &:nth-child(2) {
-          color: $priceColor;
-          margin-top: 10px;
-        }
-
-        &:last-child {
-          color: #666;
-          margin-top: 10px;
-
-          i {
-            color: $xtxColor;
-            font-size: 14px;
-            margin-right: 2px;
-          }
-
-          &:hover {
-            color: $xtxColor;
-            cursor: pointer;
-          }
-        }
-      }
-    }
-  }
 }
 
 .goods-tabs {
-  min-height: 600px;
+  min-height: 300px; // 移动端自适应高度
   background: #fff;
 
   nav {
-    height: 70px;
-    line-height: 70px;
+    height: auto; // 移动端自适应高度
+    line-height: 40px; // 移动端行高
     display: flex;
     border-bottom: 1px solid #f5f5f5;
+    overflow-x: auto; // 移动端允许水平滚动
+
+    @include pc {
+      height: 70px; // PC端固定高度
+      line-height: 70px; // PC端行高
+    }
 
     a {
-      padding: 0 40px;
-      font-size: 18px;
+      padding: 0 20px; // 移动端内边距更小
+
+      @include pc {
+        padding: 0 40px; // PC端内边距更大
+      }
+
+      font-size: 16px; // 移动端字体更小
+
+      @include pc {
+        font-size: 18px; // PC端字体更大
+      }
+
       position: relative;
 
       > span {
         color: $priceColor;
-        font-size: 16px;
-        margin-left: 10px;
+        font-size: 14px; // 移动端字体更小
+        margin-left: 5px; // 移动端间距更小
+
+        @include pc {
+          font-size: 16px; // PC端字体更大
+          margin-left: 10px; // PC端间距更大
+        }
       }
     }
   }
 }
 
 .goods-detail {
-  padding: 40px;
+  padding: 20px; // 移动端内边距更小
+
+  @include pc {
+    padding: 40px; // PC端内边距更大
+  }
 
   .attrs {
     display: flex;
     flex-wrap: wrap;
-    margin-bottom: 30px;
+    margin-bottom: 20px; // 移动端间距更小
+
+    @include pc {
+      margin-bottom: 30px; // PC端间距更大
+    }
 
     li {
       display: flex;
-      margin-bottom: 10px;
-      width: 50%;
+      margin-bottom: 10px; // 移动端间距更小
+      width: 100%; // 移动端占满宽度
+
+      @include pc {
+        margin-bottom: 10px;
+        width: 50%; // PC端两列
+      }
 
       .dt {
-        width: 100px;
+        width: 80px; // 移动端宽度更小
         color: #999;
+
+        @include pc {
+          width: 100px; // PC端宽度更大
+        }
       }
 
       .dd {
@@ -431,9 +617,18 @@ const addCart = (goods: GoodsResponse) => {
 
 .btn {
   margin-top: 20px;
+  width: 100%; // 移动端占满宽度
+
+  @include pc {
+    width: auto; // PC端自适应宽度
+  }
 }
 
 .bread-container {
-  padding: 25px 0;
+  padding: 15px 0; // 移动端内边距更小
+
+  @include pc {
+    padding: 25px 0; // PC端内边距更大
+  }
 }
 </style>

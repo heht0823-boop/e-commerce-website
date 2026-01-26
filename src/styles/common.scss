@@ -10,9 +10,17 @@ html {
 body {
   height: 100%;
   color: #333;
-  min-width: 1240px;
-  font: 1em/1.4 "Microsoft Yahei", "PingFang SC", "Avenir", "Segoe UI", "Hiragino Sans GB",
-    "STHeiti", "Microsoft Sans Serif", "WenQuanYi Micro Hei", sans-serif;
+  min-width: auto;
+  font:
+    1em/1.4 "Microsoft Yahei",
+    "PingFang SC",
+    "Avenir",
+    "Segoe UI",
+    "Hiragino Sans GB",
+    "STHeiti",
+    "Microsoft Sans Serif",
+    "WenQuanYi Micro Hei",
+    sans-serif;
 }
 body,
 ul,
@@ -61,9 +69,12 @@ ul {
 }
 
 .container {
-  width: 1240px;
+  width: 100%;
+  padding: 0 15px;
   margin: 0 auto;
-  position: relative;
+  @include pc {
+    max-width: 1170px;
+  }
 }
 .ellipsis {
   white-space: nowrap;
