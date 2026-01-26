@@ -5,7 +5,6 @@ import { computed, ref } from "vue";
 import { useUserStore } from "./userStore";
 import { insertCartAPI, findNewCartListAPI, deleteCartAPI } from "../apis/cart";
 import type { CartItem } from "@/types/cart";
-import { s } from "vue-router/dist/router-CWoNjPRp.mjs";
 export const useCartStore = defineStore(
   "cart",
   () => {

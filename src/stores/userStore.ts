@@ -6,7 +6,6 @@ import { useCartStore } from "./cartStore";
 import { mergeCartAPI } from "@/apis/cart";
 import type { LoginData, LoginResponse } from "@/types/user";
 import type { MergeCartData } from "@/types/cart";
-import { un } from "vue-router/dist/router-CWoNjPRp.mjs";
 export const useUserStore = defineStore(
   "user",
   () => {
