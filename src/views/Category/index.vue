@@ -13,7 +13,7 @@ const { categoryData } = useCategory();
       <div class="bread-container">
         <el-breadcrumb separator=">">
           <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-          <el-breadcrumb-item>{{ categoryData.name }}</el-breadcrumb-item>
+          <el-breadcrumb-item>{{ categoryData?.name }}</el-breadcrumb-item>
         </el-breadcrumb>
       </div>
       <!-- 轮播图 -->
@@ -24,7 +24,9 @@ const { categoryData } = useCategory();
           </el-carousel-item>
         </el-carousel>
       </div>
-      <div class="sub-list">
+
+      <!-- 添加条件渲染，确保 categoryData 存在后再渲染 -->
+      <div v-if="categoryData" class="sub-list">
         <h3>全部分类</h3>
         <ul>
           <li v-for="i in categoryData.children" :key="i.id">
@@ -35,7 +37,14 @@ const { categoryData } = useCategory();
           </li>
         </ul>
       </div>
-      <div class="ref-goods" v-for="item in categoryData.children" :key="item.id">
+
+      <!-- 为商品列表也添加条件渲染 -->
+      <div
+        v-if="categoryData"
+        class="ref-goods"
+        v-for="item in categoryData.children"
+        :key="item.id"
+      >
         <div class="head">
           <h3>- {{ item.name }}-</h3>
         </div>

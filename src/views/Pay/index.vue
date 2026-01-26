@@ -1,23 +1,25 @@
-<script setup>
+<script setup lang="ts">
 import { getOrderAPI } from "@/apis/pay";
 import { onMounted, ref, onUnmounted } from "vue";
 import { useRoute } from "vue-router";
+import type { PayResponse } from "@/types/pay";
 
 const route = useRoute();
-const payInfo = ref({});
-const formatTime = ref("");
-let timer = null;
+const payInfo = ref<PayResponse>();
+const formatTime = ref<string>("");
+// 兼容浏览器/Node.js 环境的类型声明
+let timer: number | NodeJS.Timeout | null = null;
 
 // 格式化倒计时时间（接收秒数）
-const formatCountdown = (seconds) => {
+const formatCountdown = (seconds: number) => {
   const minutes = Math.floor(seconds / 60);
   const remainingSeconds = seconds % 60;
   return `${minutes.toString().padStart(2, "0")}:${remainingSeconds.toString().padStart(2, "0")}`;
 };
 
 const getPayInfo = async () => {
-  const res = await getOrderAPI(route.query.id);
-  payInfo.value = res.data.result;
+  const res = await getOrderAPI(route.query.id as string);
+  payInfo.value = res?.data?.result;
 
   // 直接使用后端返回的秒数
   formatTime.value = formatCountdown(payInfo.value.countdown);
@@ -30,12 +32,14 @@ const startCountdown = () => {
   if (timer) clearInterval(timer);
 
   timer = setInterval(() => {
-    if (payInfo.value.countdown > 0) {
+    if (payInfo.value && payInfo.value?.countdown > 0) {
       payInfo.value.countdown -= 1; // 每秒减1
       formatTime.value = formatCountdown(payInfo.value.countdown);
     } else {
-      clearInterval(timer);
-      formatTime.value = "00:00";
+      if (timer) {
+        clearInterval(timer);
+        formatTime.value = "00:00";
+      }
     }
   }, 1000);
 };
@@ -70,7 +74,7 @@ onUnmounted(() => {
         </div>
         <div class="amount">
           <span>应付总额：</span>
-          <span>¥{{ payInfo.payMoney?.toFixed(2) }}</span>
+          <span>¥{{ payInfo?.payMoney?.toFixed(2) }}</span>
         </div>
       </div>
       <!-- 付款方式 -->

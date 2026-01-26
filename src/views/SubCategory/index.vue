@@ -1,11 +1,19 @@
-<script setup>
+<script setup lang="ts">
 import GoodsItem from "@/views/home/components/GoodsItem.vue";
 import { useCategoryFilter } from "@/views/SubCategory/composables/useCategoryFilter";
 import { useSubCategory } from "@/views/SubCategory/composables/useSubCategory";
 import { ref, nextTick } from "vue";
+import type { ComponentPublicInstance } from "vue";
 
-const { categoryData } = useCategoryFilter();
-const { goodsList, reqData, loading, finished } = useSubCategory();
+const { categoryData, loading: categoryLoading } = useCategoryFilter();
+const {
+  goodsList,
+  reqData,
+  loading,
+  finished,
+  error: subCategoryError,
+  getGoodsList,
+} = useSubCategory();
 
 const loadMore = () => {
   if (!loading.value && !finished.value) {
@@ -13,20 +21,24 @@ const loadMore = () => {
   }
 };
 
-// 使用 ref 引用滚动容器
-const scrollbarRef = ref();
+interface ScrollbarComponent extends ComponentPublicInstance {
+  $refs: {
+    wrapRef: HTMLElement;
+  };
+}
+
+const scrollbarRef = ref<ScrollbarComponent | null>(null);
 
 const handleScroll = async () => {
-  // 等待 DOM 更新
-  await nextTick();
+  if (loading.value || finished.value) return; // 提前返回避免不必要的计算
 
-  // 获取滚动容器元素
-  const scrollbarWrap = scrollbarRef.value?.$refs?.wrapRef;
+  await nextTick();
+  // 获取滚动容器元素并明确类型
+  const scrollbarWrap = scrollbarRef.value?.$refs?.wrapRef as HTMLElement | undefined;
+
   if (scrollbarWrap) {
     const { scrollTop, scrollHeight, clientHeight } = scrollbarWrap;
-
-    // 当滚动到底部附近时触发加载
-    if (scrollTop + clientHeight >= scrollHeight - 50 && !loading.value && !finished.value) {
+    if (scrollTop + clientHeight >= scrollHeight - 50) {
       loadMore();
     }
   }
@@ -39,20 +51,32 @@ const handleScroll = async () => {
     <div class="bread-container">
       <el-breadcrumb separator=">">
         <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-        <el-breadcrumb-item :to="{ path: `/category/${categoryData.parentId}` }">
-          {{ categoryData.parentName }}
+        <el-breadcrumb-item
+          v-if="categoryData && categoryData.parentName"
+          :to="{ path: `/category/${categoryData.parentId}` }"
+        >
+          {{ categoryData?.parentName }}
         </el-breadcrumb-item>
-        <el-breadcrumb-item>{{ categoryData.name }}</el-breadcrumb-item>
+        <el-breadcrumb-item v-if="categoryData">{{ categoryData?.name }}</el-breadcrumb-item>
       </el-breadcrumb>
     </div>
+
     <div class="sub-container">
       <el-tabs v-model="reqData.sortField">
         <el-tab-pane label="最新商品" name="publishTime"></el-tab-pane>
         <el-tab-pane label="最高人气" name="orderNum"></el-tab-pane>
         <el-tab-pane label="评论最多" name="evaluateNum"></el-tab-pane>
       </el-tabs>
+
+      <!-- 错误显示 -->
+      <div v-if="subCategoryError" class="error-container">
+        <p>加载失败: {{ subCategoryError }}</p>
+        <el-button @click="getGoodsList">重新加载</el-button>
+      </div>
+
       <!-- 使用 el-scrollbar 实现无限滚动 -->
       <el-scrollbar
+        v-else
         ref="scrollbarRef"
         height="600px"
         @scroll="handleScroll"
@@ -64,11 +88,21 @@ const handleScroll = async () => {
             <GoodsItem v-for="goods in goodsList" :goods="goods" :key="goods.id"></GoodsItem>
 
             <!-- 加载提示 -->
-            <div v-if="loading && goodsList.length > 0" class="loading-wrapper">加载中...</div>
+            <div
+              v-if="categoryLoading && goodsList && goodsList.length > 0"
+              class="loading-wrapper"
+            >
+              加载中...
+            </div>
 
             <!-- 没有更多数据提示 -->
-            <div v-if="finished && goodsList.length > 0" class="no-more-wrapper">
+            <div v-if="finished && goodsList && goodsList.length > 0" class="no-more-wrapper">
               没有更多数据了
+            </div>
+
+            <!-- 空状态 -->
+            <div v-if="!loading && (!goodsList || goodsList.length === 0)" class="empty-wrapper">
+              暂无商品数据
             </div>
           </div>
         </div>
@@ -91,16 +125,15 @@ const handleScroll = async () => {
     display: flex;
     flex-wrap: wrap;
     padding: 0 10px;
-    gap: 20px; // 商品之间的间距
+    gap: 20px;
 
-    // 确保商品项宽度正确
     .goods-item {
-      flex: 0 0 calc((100% - 40px) / 4); // 每行4个商品，考虑gap的总宽度
+      flex: 0 0 calc((100% - 40px) / 4);
       display: block;
-      margin: 0; // 移除外边距
+      margin: 0;
       padding: 20px 30px;
       text-align: center;
-      box-sizing: border-box; // 确保padding不增加元素宽度
+      box-sizing: border-box;
 
       img {
         width: 160px;
@@ -135,11 +168,17 @@ const handleScroll = async () => {
   }
 
   .loading-wrapper,
-  .no-more-wrapper {
-    flex: 0 0 100%; // 占满整行
+  .no-more-wrapper,
+  .empty-wrapper {
+    flex: 0 0 100%;
     text-align: center;
     padding: 20px;
-    grid-column: 1 / -1; // 如果使用grid布局
+  }
+
+  .error-container {
+    text-align: center;
+    padding: 40px;
+    color: #f56c6c;
   }
 
   .pagination-container {

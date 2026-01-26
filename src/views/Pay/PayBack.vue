@@ -1,13 +1,14 @@
-<script setup>
+<script setup lang="ts">
 import { getOrderAPI } from "@/apis/pay";
 import { onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
+import type { PayResponse } from "@/types/pay";
 const route = useRoute();
-const orderInfo = ref({});
+const orderInfo = ref<PayResponse>();
 
 const getOrderInfo = async () => {
-  const res = await getOrderAPI(route.query.id);
-  orderInfo.value = res.data.result;
+  const res = await getOrderAPI(route.query.id as string);
+  orderInfo.value = res?.data?.result;
 };
 onMounted(() => {
   getOrderInfo();
@@ -25,7 +26,7 @@ onMounted(() => {
         <p class="tip">我们将尽快为您发货，收货期间请保持手机畅通</p>
         <p>支付方式：<span>支付宝</span></p>
         <p>
-          支付金额：<span>¥{{ orderInfo.payMoney?.toFixed(2) }}</span>
+          支付金额：<span>¥{{ orderInfo?.payMoney?.toFixed(2) }}</span>
         </p>
         <div class="btn">
           <el-button type="primary" style="margin-right: 20px">查看订单</el-button>

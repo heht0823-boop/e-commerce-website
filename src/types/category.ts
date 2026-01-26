@@ -58,7 +58,7 @@ export interface TemporaryData {
   pageSize: number;
   sortField: string;
 }
-type TemporaryItems = CategoryChildGoods[];
+export type TemporaryItems = CategoryChildGoods[];
 export interface TemporaryResponse {
   counts: number;
   items: TemporaryItems;
