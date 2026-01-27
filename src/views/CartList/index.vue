@@ -65,11 +65,11 @@ watch(
               </td>
               <td>
                 <div class="goods">
-                  <RouterLink to="/"><img :src="i.picture" alt="" /></RouterLink>
+                  <RouterLink to="/">
+                    <img :src="i.picture" alt="" class="product-img" />
+                  </RouterLink>
                   <div>
-                    <p class="name ellipsis">
-                      {{ i.name }}
-                    </p>
+                    <p class="name ellipsis">{{ i.name }}</p>
                   </div>
                 </div>
               </td>
@@ -178,59 +178,131 @@ watch(
 .xtx-cart-page {
   margin-top: 20px;
 
-  .cart {
-    background: #fff;
-    color: #666;
+  .cart-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 20px 0;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
 
-    table {
-      width: 100%;
-      border-spacing: 0;
-      border-collapse: collapse;
-      line-height: 24px;
+  .cart-item {
+    flex: 1 1 calc(33.33% - 20px); // 默认三列
+    min-width: 300px;
+    border: 1px solid #f5f5f5;
+    border-radius: 8px;
+    padding: 16px;
+    background: white;
+    transition: box-shadow 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
+    &:hover {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
+
+    &.disabled {
+      opacity: 0.7;
+    }
+  }
+
+  .item-header {
+    margin-bottom: 10px;
+  }
+
+  .item-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .goods {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+
+    .product-img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 4px;
+      background-color: #f5f5f5;
+    }
+
+    .name {
+      font-size: 14px;
+      color: #333;
+      margin: 0;
+    }
+  }
+
+  .price,
+  .quantity,
+  .subtotal,
+  .actions {
+    margin: 8px 0;
+    text-align: right;
+  }
+
+  .quantity {
+    width: 100px;
+  }
+
+  .actions a {
+    color: #e4393c;
+    cursor: pointer;
+  }
+
+  .invalid-tip {
+    padding: 10px;
+    background-color: #f5f5f5;
+    border: 1px dashed #ddd;
+    margin: 10px 0;
+    text-align: center;
+    font-size: 14px;
+    color: #e4393c;
+  }
+
+  .cart-none {
+    padding: 40px;
+    text-align: center;
   }
 
   .action {
     display: flex;
-    background: #fff;
+    background: white;
     margin-top: 20px;
     height: auto;
     align-items: stretch;
-    flex-direction: column; // 手机端默认纵向排列
+    flex-direction: column;
+
+    .batch {
+      padding: 15px;
+      border-bottom: 1px solid #f5f5f5;
+      font-size: 14px;
+      color: #666;
+    }
+
+    .total {
+      padding: 15px;
+      text-align: right;
+    }
   }
 }
 
 // 手机端样式（＜768px）
 @include mobile {
   .xtx-cart-page {
-    .cart {
-      table.mobile-table {
-        display: block;
+    .cart-items {
+      flex-direction: column;
+      gap: 10px;
 
-        thead,
-        tbody,
-        tr {
-          display: block;
-        }
-
-        tr {
-          display: flex;
-          flex-direction: column;
-          border-bottom: 1px solid #f5f5f5;
-          margin-bottom: 10px;
-
-          td,
-          th {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px;
-            border-bottom: none;
-
-            &:first-child {
-              padding-left: 15px;
-            }
-          }
-        }
+      .cart-item {
+        flex: none;
+        width: 100%;
+        min-width: auto;
       }
     }
 
@@ -250,32 +322,14 @@ watch(
 // PC 端样式（≥768px）
 @include pc {
   .xtx-cart-page {
-    .cart {
-      table.pc-table {
-        thead,
-        tbody,
-        tr,
-        th,
-        td {
-          display: table-cell;
-        }
-
-        th,
-        td {
-          padding: 10px;
-          border-bottom: 1px solid #f5f5f5;
-
-          &:first-child {
-            text-align: left;
-            padding-left: 30px;
-            color: #999;
-          }
-        }
+    .cart-items {
+      .cart-item {
+        flex: 1 1 calc(33.33% - 20px); // 大屏三列
       }
     }
 
     .action {
-      flex-direction: row; // PC 端横向排列
+      flex-direction: row;
       height: 80px;
       align-items: center;
 
