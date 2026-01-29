@@ -137,7 +137,22 @@ onMounted(() => {
 
   .goods-list {
     display: flex;
-    justify-content: space-around;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    padding: 20px 0;
+    overflow-y: auto;
+    max-height: 300px;
+    scrollbar-width: thin;
+    scrollbar-color: #e0e0e0 #fff;
+
+    > * {
+      flex: 0 0 calc(25% - 10px);
+      margin-bottom: 15px;
+
+      &:nth-child(4n) {
+        margin-right: 0;
+      }
+    }
   }
 }
 </style>

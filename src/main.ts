@@ -10,6 +10,16 @@ import ElementPlus from "element-plus";
 import "element-plus/dist/index.css";
 // 引入初始化样式
 import "@/styles/common.scss";
+// 仅在开发环境启动 Mock
+if (import.meta.env.DEV) {
+  (async () => {
+    const { worker } = await import("./mocks/browser");
+    worker.start({
+      quiet: false,
+      onUnhandledRequest: "bypass",
+    });
+  })();
+}
 
 const app = createApp(App);
 const pinia = createPinia();

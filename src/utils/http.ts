@@ -73,7 +73,7 @@ httpInstance.interceptors.response.use(
       if (e.response.status >= 500) {
         ElMessage.error("服务器错误，请稍后重试");
       } else if (e.response.status >= 400) {
-        ElMessage.warning(e.response.data?.msg || "请求失败");
+        ElMessage.warning(e.response.data?.data.msg || "请求失败");
       }
     } else {
       ElMessage.error("网络异常，请检查网络");

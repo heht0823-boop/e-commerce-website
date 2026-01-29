@@ -12,6 +12,9 @@ const confirm = () => {
 const myOrder = () => {
   router.push("/member/order");
 };
+const myMember = () => {
+  router.push("/member/myMember");
+};
 </script>
 
 <template>
@@ -39,7 +42,7 @@ const myOrder = () => {
             </el-popconfirm>
           </li>
           <li><a href="javascript:;" @click="myOrder">我的订单</a></li>
-          <li><a href="javascript:;">会员中心</a></li>
+          <li><a href="javascript:;" @click="myMember">会员中心</a></li>
         </template>
         <template v-else>
           <li><a href="javascript:;" @click="$router.push('/Login')">请先登录</a></li>

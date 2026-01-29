@@ -62,6 +62,21 @@ const router = createRouter({
               component: () => import("@/views/Member/components/UserOrder.vue"),
               meta: { requiresAuth: true },
             },
+            {
+              path: "security",
+              component: () => import("@/views/Member/components/UserSecurity.vue"),
+              meta: { requiresAuth: true },
+            },
+            {
+              path: "address",
+              component: () => import("@/views/Member/components/UserAddress.vue"),
+              meta: { requiresAuth: true },
+            },
+            {
+              path: "myMember",
+              component: () => import("@/views/Member/components/MyMember.vue"),
+              meta: { requiresAuth: true },
+            },
           ],
         },
       ],

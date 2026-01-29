@@ -22,6 +22,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.37.0",
+    "@faker-js/faker": "^10.2.0",
     "@types/node": "^25.0.10",
     "@typescript-eslint/eslint-plugin": "^8.53.1",
     "@typescript-eslint/parser": "^8.53.1",
@@ -30,6 +31,7 @@
     "eslint": "^9.37.0",
     "eslint-plugin-vue": "~10.5.0",
     "globals": "^16.4.0",
+    "msw": "^2.12.7",
     "pinia-plugin-persistedstate": "^4.7.1",
     "postcss-pxtorem": "^6.1.0",
     "sass": "^1.94.2",
@@ -39,5 +41,10 @@
     "vite": "^7.1.11",
     "vite-plugin-vue-devtools": "^8.0.3",
     "vue-tsc": "^3.2.3"
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
   }
 }
