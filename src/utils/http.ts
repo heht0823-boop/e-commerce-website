@@ -15,15 +15,15 @@ const httpInstance = axios.create({
 httpInstance.interceptors.request.use(
   // 2. 统一使用 InternalAxiosRequestConfig 类型约束 config 参数
   (config: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
-    // 开发环境下打印请求信息
-    if (import.meta.env.DEV) {
-      console.log("%c[API Request]", "color: blue; font-weight: bold;", config.url, {
-        method: config.method,
-        params: config.params,
-        data: config.data,
-        headers: config.headers,
-      });
-    }
+    // // 开发环境下打印请求信息
+    // if (import.meta.env.DEV) {
+    //   console.log("%c[API Request]", "color: blue; font-weight: bold;", config.url, {
+    //     method: config.method,
+    //     params: config.params,
+    //     data: config.data,
+    //     headers: config.headers,
+    //   });
+    // }
 
     // 从pinia获取token数据
     const userStore = useUserStore();
@@ -48,10 +48,10 @@ let isredirectingToLogin = false;
 // axios响应拦截器：显式指定泛型 <ApiResponse, ApiResponse>，适配返回值类型
 httpInstance.interceptors.response.use(
   (res: AxiosResponse<ApiResponse>) => {
-    // 开发环境下打印响应信息
-    if (import.meta.env.DEV) {
-      console.log("%c[API Response]", "color: green; font-weight: bold;", res.config.url, res.data);
-    }
+    // // 开发环境下打印响应信息
+    // if (import.meta.env.DEV) {
+    //   console.log("%c[API Response]", "color: green; font-weight: bold;", res.config.url, res.data);
+    // }
     // 直接返回 res.data（类型为 ApiResponse），泛型已适配，无报错
     return res;
   },
