@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { useMockUserStore } from "@/stores/mock/userStore";
 import { getLikeListAPI } from "@/apis/user";
-import GoodsItem from "@/views/home/components/GoodsItem.vue";
-import { onMounted, ref } from "vue";
+import { defineAsyncComponent, onMounted, ref } from "vue";
 import type { relevantResponse } from "@/types/user";
-
+const GoodsItem = defineAsyncComponent(() => import("@/views/home/components/GoodsItem.vue"));
 const mockUserStore = useMockUserStore();
 const likeList = ref<relevantResponse>();
 

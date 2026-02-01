@@ -2,7 +2,7 @@
 import { getHotGoodsAPI } from "@/apis/detail";
 import { ref, onMounted, computed } from "vue";
 import { useRoute } from "vue-router";
-import type { GoodsHotParams, GoodsHotResponse } from "@/types/detail";
+import type { GoodsHotResponse } from "@/types/detail";
 const props = defineProps({
   hotType: {
     type: Number,

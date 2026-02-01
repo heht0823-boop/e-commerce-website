@@ -5,7 +5,6 @@ import App from "./App.vue";
 import router from "./router";
 import { componentPlugin } from "@/components/index";
 import piniaPluginPersistedstate from "pinia-plugin-persistedstate";
-import ElementPlus from "element-plus";
 // 引入 Element Plus 样式
 import "element-plus/dist/index.css";
 // 引入初始化样式
@@ -28,7 +27,6 @@ app.use(pinia);
 // 注册持久化插件
 pinia.use(piniaPluginPersistedstate);
 app.use(router);
-app.use(ElementPlus);
 app.use(lazyPlugin);
 app.use(componentPlugin);
 app.mount("#app");

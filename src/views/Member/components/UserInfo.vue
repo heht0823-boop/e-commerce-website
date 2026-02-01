@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { useUserStore } from "@/stores/userStore";
 import { getLikeListAPI } from "@/apis/user";
-import GoodsItem from "@/views/home/components/GoodsItem.vue";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, defineAsyncComponent } from "vue";
 import type { relevantResponse } from "@/types/user";
+const GoodsItem = defineAsyncComponent(() => import("@/views/home/components/GoodsItem.vue"));
 const userStore = useUserStore();
 const likeList = ref<relevantResponse>();
 const getLikeList = async () => {

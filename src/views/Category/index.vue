@@ -1,7 +1,8 @@
 <script setup>
-import GoodsItem from "@/views/home/components/GoodsItem.vue";
+const GoodsItem = defineAsyncComponent(() => import("@/views/home/components/GoodsItem.vue"));
 import { useBanner } from "@/views/Category/composables/useBanner";
 import { useCategory } from "@/views/Category/composables/useCategory";
+import { defineAsyncComponent } from "vue";
 const { bannerList } = useBanner();
 const { categoryData } = useCategory();
 </script>

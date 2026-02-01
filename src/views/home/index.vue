@@ -1,10 +1,11 @@
 <!-- 修复后的 Home.vue -->
 <script setup lang="ts">
+import { defineAsyncComponent } from "vue";
 import HomeCategory from "./components/HomeCategory.vue";
 import HomeBanner from "./components/HomeBanner.vue";
 import HomeNew from "./components/HomeNew.vue";
-import HomeHot from "./components/HomeHot.vue";
-import HomeProduct from "./components/HomeProduct.vue";
+const HomeHot = defineAsyncComponent(() => import("./components/HomeHot.vue"));
+const HomeProduct = defineAsyncComponent(() => import("./components/HomeProduct.vue"));
 </script>
 
 <template>
