@@ -25,18 +25,24 @@ onMounted(() => {
       <h4>{{ userStore.userInfo?.account }}</h4>
     </div>
     <div class="item">
-      <a href="javascript:;">
-        <span class="iconfont icon-hy"></span>
-        <p>会员中心</p>
-      </a>
-      <a href="javascript:;">
-        <span class="iconfont icon-aq"></span>
-        <p>安全设置</p>
-      </a>
-      <a href="javascript:;">
-        <span class="iconfont icon-dw"></span>
-        <p>地址管理</p>
-      </a>
+      <router-link to="/member/myMember" custom v-slot="{ navigate }">
+        <a href="javascript:;" @click="navigate">
+          <span class="iconfont icon-hy"></span>
+          <p>会员中心</p>
+        </a>
+      </router-link>
+      <router-link to="/member/security" custom v-slot="{ navigate }">
+        <a href="javascript:;" @click="navigate">
+          <span class="iconfont icon-aq"></span>
+          <p>安全设置</p>
+        </a>
+      </router-link>
+      <router-link to="/member/address" custom v-slot="{ navigate }">
+        <a href="javascript:;" @click="navigate">
+          <span class="iconfont icon-dw"></span>
+          <p>地址管理</p>
+        </a>
+      </router-link>
     </div>
   </div>
   <div class="like-container">

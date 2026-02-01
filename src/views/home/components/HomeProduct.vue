@@ -5,16 +5,25 @@ import { ref } from "vue";
 import { getGoodsAPI } from "@/apis/home";
 import GoodsItem from "@/views/home/components/GoodsItem.vue";
 import type { HomeGoodsResponse } from "@/types/home";
-import { useBreakpoint } from "@/composables/useBreakpoint";
+import { useRouter } from "vue-router";
+import { ro } from "element-plus/es/locales.mjs";
 
 const goodsProduct = ref<HomeGoodsResponse>();
-const { isMobile, isPc } = useBreakpoint();
 
 const getGoodsProduct = async () => {
   const res = await getGoodsAPI();
   goodsProduct.value = res?.data?.result;
 };
 getGoodsProduct();
+const router = useRouter();
+const detail = (id: string) => {
+  router.push({
+    name: "Detail",
+    params: {
+      id,
+    },
+  });
+};
 </script>
 
 <template>
@@ -24,13 +33,13 @@ getGoodsProduct();
         <RouterLink class="cover" to="/">
           <img v-img-lazy="cate.picture" />
           <strong class="label">
-            <span>{{ cate.name }}馆</span>
+            <span>{{ cate.name }}</span>
             <span>{{ cate.saleInfo }}</span>
           </strong>
         </RouterLink>
         <!-- 使用响应式布局 -->
         <ul class="goods-list">
-          <li v-for="goods in cate.goods" :key="goods.id">
+          <li v-for="goods in cate.goods" :key="goods.id" @click="detail(goods.id)">
             <GoodsItem :goods="goods" />
           </li>
         </ul>

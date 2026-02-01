@@ -1,18 +1,57 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import "element-plus/theme-chalk/el-message.css";
+import { ref, onMounted } from "vue";
 import { ElMessage, FormItemRule, ElForm } from "element-plus";
 import { useRouter } from "vue-router";
+import { useRoute } from "vue-router";
 import { useUserStore } from "@/stores/userStore";
+import { encryptData, decryptData } from "./CryptoJs";
+import { debounce } from "@/composables/debounce/debounce";
+
 const UserStore = useUserStore();
-//表单验证(账号名+密码)
-//1.准备表单对象
+const route = useRoute();
+
+// 获取从退出登录传递过来的记住密码状态（需要解码）
+const routeAccount = route.query.account ? decodeURIComponent(route.query.account as string) : "";
+const routePassword = route.query.password
+  ? decodeURIComponent(route.query.password as string)
+  : "";
+const routeRememberMe = route.query.rememberMe === "true";
+
+// 表单验证
 const form = ref({
-  account: "",
-  password: "",
+  account: routeAccount,
+  password: routePassword,
+  rememberMe: routeRememberMe,
   agree: true,
 });
-//2.准备规则对象
+
+// 保存记住的账号密码（加密后存储）
+const saveRememberedCredentials = (account: string, password: string) => {
+  const data = {
+    account,
+    password,
+    timestamp: new Date().getTime(), // 当前时间戳
+  };
+
+  // 使用加密函数加密整个对象
+  const encryptedData = encryptData(data);
+
+  if (encryptedData) {
+    // 确保加密成功
+    localStorage.setItem("loadRememberedCredentials", encryptedData);
+    console.log("✅ 加密数据已保存到本地存储");
+  } else {
+    console.error("❌ 加码失败，未保存数据");
+  }
+};
+
+// 清除记住的账号密码
+const clearRememberedCredentials = () => {
+  localStorage.removeItem("loadRememberedCredentials");
+  console.log("✅ 已清除记住的登录信息");
+};
+
+// 表单规则
 const rules: Record<string, FormItemRule[]> = {
   account: [
     {
@@ -46,28 +85,46 @@ const rules: Record<string, FormItemRule[]> = {
     },
   ],
 };
-//3.获取form实例做统一校验
+
+// 登录方法
 const formRef = ref<InstanceType<typeof ElForm>>();
 const router = useRouter();
-const dologin = () => {
-  const { account, password } = form.value;
-  formRef.value?.validate(async (vaild) => {
-    //vaild为true表示所有验证通过
-    if (vaild) {
+
+const dologin = async () => {
+  if (routeAccount && routePassword && routeRememberMe) {
+    clearRememberedCredentials();
+  }
+  const { account, password, rememberMe } = form.value;
+
+  const valid = await formRef.value?.validate().catch(() => false);
+
+  if (valid) {
+    try {
       // 登录成功
       await UserStore.getUserInfo({ account, password });
-      //1.提示用户
-      ElMessage({ type: "success", message: "登录成功" });
-      //2.跳转首页
-      router.replace({ path: "/" });
-    }
-  });
-};
-//1.用户名和密码 只需要通过简单的配置(看文档的方式-复杂功能通过多个不同组件拆解)
-//2.同意协议 自定义规则 validator:(rule,value,callback)=>{}
-//3.统一校验 通过调用from实例的方法validate->true
-</script>
 
+      // 如果勾选了记住密码，保存账号密码
+      if (rememberMe) {
+        saveRememberedCredentials(account, password);
+      } else {
+        clearRememberedCredentials();
+      }
+
+      // 提示用户
+      ElMessage({ type: "success", message: "登录成功" });
+      // 跳转首页
+      router.replace({ path: "/" });
+    } catch (error: any) {
+      // 添加类型注解
+      console.error("登录失败:", error);
+      // 修复错误处理
+      const errorMsg = error.response?.data?.message || error.message || "登录失败，请检查账号密码";
+      ElMessage({ type: "error", message: errorMsg });
+    }
+  }
+};
+const debounceLogin = debounce(dologin, 400, true);
+</script>
 <template>
   <div>
     <header class="login-header">
@@ -98,17 +155,23 @@ const dologin = () => {
               status-icon
             >
               <el-form-item prop="account" label="账户">
-                <el-input v-model="form.account" />
+                <el-input v-model="form.account" placeholder="请输入用户名" />
               </el-form-item>
               <el-form-item prop="password" label="密码">
-                <el-input v-model="form.password" />
+                <el-input v-model="form.password" type="password" placeholder="请输入密码" />
               </el-form-item>
-              <el-form-item prop="agree" label-width="22px">
-                <el-checkbox size="large" v-model="form.agree">
-                  我已同意隐私条款和服务条款
-                </el-checkbox>
+
+              <!-- 记住密码和协议 -->
+              <el-form-item prop="rememberMe" label-width="22px">
+                <div class="login-options">
+                  <el-checkbox v-model="form.rememberMe" size="large"> 记住密码 </el-checkbox>
+                  <el-checkbox size="large" v-model="form.agree">
+                    我已同意隐私条款和服务条款
+                  </el-checkbox>
+                </div>
               </el-form-item>
-              <el-button size="large" class="subBtn" @click="dologin">点击登录</el-button>
+
+              <el-button size="large" class="subBtn" @click="debounceLogin">点击登录</el-button>
             </el-form>
           </div>
         </div>
@@ -131,7 +194,6 @@ const dologin = () => {
     </footer>
   </div>
 </template>
-
 <style scoped lang="scss">
 .login-header {
   background: #fff;
@@ -173,6 +235,22 @@ const dologin = () => {
       font-size: 14px;
       color: $xtxColor;
       letter-spacing: -5px;
+    }
+  }
+}
+.login-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+
+  :deep(.el-checkbox) {
+    margin-right: 0;
+    margin-bottom: 8px;
+
+    .el-checkbox__label {
+      font-size: 12px;
+      color: #666;
     }
   }
 }

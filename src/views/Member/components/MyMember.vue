@@ -143,7 +143,7 @@ const formatDate = (dateString: string) => {
   padding: 20px;
 
   .overview-section {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #50d2b6 0%, #2eac91 100%);
     border-radius: 8px;
     padding: 30px;
     color: white;
@@ -278,7 +278,7 @@ const formatDate = (dateString: string) => {
 
       .progress-fill {
         height: 100%;
-        background: linear-gradient(90deg, #667eea, #764ba2);
+        background: linear-gradient(90deg, #81ead3, #0fd6ab);
         border-radius: 6px;
         transition: width 0.3s ease;
       }

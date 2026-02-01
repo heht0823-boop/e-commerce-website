@@ -49,7 +49,7 @@ export const useUserStore = defineStore(
     };
     //退出时清除用户信息
     const clearUserInfo = () => {
-      userInfo.value = DEFAULT_USER_INFO;
+      localStorage.removeItem("user");
       //执行清除购物车的action函数
       cartStore.clearCart();
     };

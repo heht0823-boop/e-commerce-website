@@ -8,6 +8,7 @@ import { useCartStore } from "@/stores/cartStore";
 import type { GoodsResponse } from "@/types/detail";
 import type { CartItem } from "@/types/cart";
 import { useBreakpoint } from "@/composables/useBreakpoint";
+import { debounce } from "@/composables/debounce/debounce";
 
 //懒加载DetailHot组件
 const DetailHot = defineAsyncComponent(() => import("@/views/Detail/components/DetailHot.vue"));
@@ -88,6 +89,7 @@ const addCart = (goods: GoodsResponse) => {
     ElMessage.warning("请选择商品规格");
   }
 };
+const debounceAddCart = debounce(addCart, 500, true);
 </script>
 
 <template>
@@ -169,7 +171,9 @@ const addCart = (goods: GoodsResponse) => {
               <el-input-number v-model="count" @change="countChange" />
               <!-- 按钮组件 -->
               <div>
-                <el-button size="large" class="btn" @click="addCart"> 加入购物车 </el-button>
+                <el-button size="large" class="btn" @click="debounceAddCart">
+                  加入购物车
+                </el-button>
               </div>
             </div>
           </div>

@@ -1,17 +1,93 @@
 <script setup lang="ts">
 import { useUserStore } from "@/stores/userStore";
+import { encryptData, decryptData } from "@/views/Login/CryptoJs";
 import { useRouter } from "vue-router";
+import { ElMessage } from "element-plus";
+
+// 定义用户数据接口
+interface UserData {
+  account: string;
+  password: string;
+  timestamp: number;
+}
+
 const userStore = useUserStore();
 const router = useRouter();
+
+// 从localStorage中加载记住的账号密码
+const loadRememberedCredentials = () => {
+  try {
+    const encryptedStr = localStorage.getItem("loadRememberedCredentials");
+    if (encryptedStr) {
+      // 解密数据
+      const decryptedData = decryptData(encryptedStr) as UserData;
+
+      // 检查解密是否成功且数据有效
+      if (
+        decryptedData &&
+        typeof decryptedData === "object" &&
+        decryptedData.account &&
+        decryptedData.password
+      ) {
+        // 检查是否过期(七天有效期)
+        const now = new Date().getTime();
+        if (now - decryptedData.timestamp < 7 * 24 * 60 * 60 * 1000) {
+          return {
+            account: decryptedData.account,
+            password: decryptedData.password,
+            rememberMe: true,
+          };
+        } else {
+          // 清除过期数据
+          localStorage.removeItem("loadRememberedCredentials");
+          ElMessage({ type: "info", message: "记住的登录信息已过期，已自动清除" });
+        }
+      } else {
+        // 解密失败或数据格式不正确
+        localStorage.removeItem("loadRememberedCredentials");
+        ElMessage({ type: "warning", message: "记住的登录信息格式错误，已清除" });
+      }
+    }
+  } catch (error) {
+    console.error("加载记住的账号密码失败", error);
+    ElMessage({ type: "error", message: "加载记住的账号密码失败" });
+  }
+
+  return {
+    account: "",
+    password: "",
+    rememberMe: false,
+  };
+};
+
 const confirm = () => {
+  const { account, password, rememberMe } = loadRememberedCredentials();
+
   //退出登录清除用户信息
   userStore.clearUserInfo();
+
+  //构建查询参数
+  const query: any = {
+    rememberMe: rememberMe ? "true" : "false",
+  };
+
+  //只有在有有效账号密码时才添加到查询参数
+  if (account && password) {
+    query.account = encodeURIComponent(account);
+    query.password = encodeURIComponent(password);
+  }
+
   //跳转登录页
-  router.push("/Login");
+  router.push({
+    path: "/login",
+    query,
+  });
 };
+
 const myOrder = () => {
   router.push("/member/order");
 };
+
 const myMember = () => {
   router.push("/member/myMember");
 };

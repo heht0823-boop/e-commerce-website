@@ -31,7 +31,8 @@
     "src/stores/cartStore.ts",
     "src/apis/category.ts",
     "src/stores/userStore.ts",
-    "src/stores/categoryStore.ts"
+    "src/stores/categoryStore.ts",
+    "src/views/Login/CryptoJs.js"
   ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

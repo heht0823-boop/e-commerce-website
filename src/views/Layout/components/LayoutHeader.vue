@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useCategoryStore } from "@/stores/categoryStore";
 import HeaderCart from "./HeaderCart.vue";
+import SearchBar from "./SearchBar.vue";
 import { ref } from "vue";
 const categoryStore = useCategoryStore();
 const isMobileMenuOpen = ref(false);
@@ -26,7 +27,10 @@ const toggleMobileMenu = () => {
             </RouterLink>
           </li>
         </ul>
-
+        <SearchBar />
+        <div class="mobile-menu">
+          <i class="iconfont icon-menu"></i>
+        </div>
         <!-- 移动端菜单按钮 -->
         <div class="mobile-menu-toggle" @click="toggleMobileMenu">
           <i class="iconfont icon-menu"></i>
