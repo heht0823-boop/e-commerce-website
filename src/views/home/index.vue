@@ -1,4 +1,4 @@
-<!-- src/views/home/index.vue -->
+<!-- 修复后的 Home.vue -->
 <script setup lang="ts">
 import HomeCategory from "./components/HomeCategory.vue";
 import HomeBanner from "./components/HomeBanner.vue";
@@ -9,10 +9,15 @@ import HomeProduct from "./components/HomeProduct.vue";
 
 <template>
   <div class="home-page">
-    <div class="container">
-      <HomeCategory />
-      <HomeBanner />
+    <!-- PC端：侧边栏+轮播图横向排列 -->
+    <div class="container home-container">
+      <div class="home-content">
+        <HomeCategory class="home-sidebar" />
+        <HomeBanner class="home-main" />
+      </div>
     </div>
+
+    <!-- 其他内容区域 -->
     <HomeNew />
     <HomeHot />
     <HomeProduct />
@@ -23,23 +28,46 @@ import HomeProduct from "./components/HomeProduct.vue";
 .home-page {
   min-height: calc(100vh - 200px);
 
-  .container {
-    padding: 10px;
+  .home-container {
+    padding: 0;
+    margin: 20px auto;
+    max-width: 1200px;
 
-    @include pc {
+    .home-content {
       display: flex;
-      gap: 10px;
+      width: 100%;
+      min-height: 400px; // 确保最小高度
+
+      .home-sidebar {
+        flex-shrink: 0; // 防止侧边栏被压缩
+      }
+
+      .home-main {
+        flex: 1; // 轮播图占据剩余空间
+        min-width: 0; // 防止flex item溢出
+      }
     }
   }
 }
 
-.container {
-  width: 100%;
-  padding: 0 15px;
-  margin: 0 auto;
+// 移动端适配
+@media (max-width: 768px) {
+  .home-page {
+    .home-container {
+      margin: 10px auto;
 
-  @include pc {
-    max-width: 1170px;
+      .home-content {
+        display: block; // 移动端改为纵向排列
+
+        .home-sidebar {
+          display: none; // 隐藏侧边栏
+        }
+
+        .home-main {
+          width: 100%;
+        }
+      }
+    }
   }
 }
 </style>
