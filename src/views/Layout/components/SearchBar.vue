@@ -69,7 +69,7 @@ const onInput = debounce(() => {
     return;
   }
   handleSearch();
-}, 300);
+}, 500);
 
 function handleSearch() {
   const kw = keyword.value.trim();
@@ -116,7 +116,6 @@ function handleSearch() {
       });
     });
   }
-  addHistory(kw);
 }
 
 function addHistory(kw: string) {
@@ -149,6 +148,7 @@ function handleEnter(kw: string) {
       }
     }
   });
+  addHistory(kw);
 }
 function selectKeyword(kw: string) {
   keyword.value = kw;
@@ -179,7 +179,6 @@ function onBlur() {
   // 延迟隐藏，避免点击建议/历史时丢失焦点
   setTimeout(() => (showPanel.value = false), 200);
 }
-console.log(searchResults.value);
 </script>
 
 <style scoped>
